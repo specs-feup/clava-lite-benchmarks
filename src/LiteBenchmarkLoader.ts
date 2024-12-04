@@ -3,11 +3,19 @@ import ClavaJoinPoints from "@specs-feup/clava/api/clava/ClavaJoinPoints.js";
 import Io from "@specs-feup/lara/api/lara/Io.js";
 import chalk from "chalk";
 import { readdirSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 export class LiteBenchmarkLoader {
     static load(suite: BenchmarkSuite, app: string, cachedPath?: string): string {
         const summary = suite.appDetails[app];
-        const fullPath = cachedPath == undefined ? `${suite.path}${app}` : cachedPath;
+
+        const fullPath = cachedPath != undefined ? cachedPath : (() => {
+            const __filename = fileURLToPath(import.meta.url);
+            const __dirname = path.dirname(__filename);
+
+            return path.join(__dirname, "../../", `${suite.path}${app}`);
+        })();
 
         Clava.getData().setStandard(summary.standard);
         Clava.getData().setFlags(suite.flags.join(" "));

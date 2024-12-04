@@ -2,7 +2,7 @@
   "name": "clava-lite-benchmarks",
   "version": "1.0.0",
   "author": "tiagolascasas",
-  "description": "A collection of applications and benchmark suites used as testing inputs to several Clava-JS packages",
+  "description": "A collection of applications and benchmark suites used as testing inputs to several Clava NPM packages",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -11,6 +11,13 @@
     "docs": "typedoc",
     "test:loading": "clava dist/test/TestLoading.js"
   },
+  "exports": {
+    "./LiteBenchmarkLoader": "./dist/src/LiteBenchmarkLoader.js",
+    "./SuiteSelector": "./dist/src/SuiteSelector.js"
+  },
+  "files": [
+    "benchmarks/"
+  ],
   "dependencies": {
     "@specs-feup/clava": "^3.0.1",
     "@specs-feup/lara": "^3.0.2",
