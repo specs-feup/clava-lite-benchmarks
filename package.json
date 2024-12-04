@@ -13,7 +13,8 @@
   },
   "exports": {
     "./LiteBenchmarkLoader": "./dist/src/LiteBenchmarkLoader.js",
-    "./SuiteSelector": "./dist/src/SuiteSelector.js"
+    "./SuiteSelector": "./dist/src/SuiteSelector.js",
+    "./SuiteRunner": "./dist/src/SuiteRunner.js"
   },
   "files": [
     "benchmarks/"
