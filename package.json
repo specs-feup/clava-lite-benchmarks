@@ -9,13 +9,11 @@
     "build:watch": "tsc --watch",
     "lint": "eslint .",
     "docs": "typedoc",
-    "test": "cross-env NODE_OPTIONS='$NODE_OPTIONS --experimental-vm-modules' jest --detectOpenHandles --forceExit src",
-    "test:cov": "npm run test -- --coverage",
-    "test:watch": "npm run test -- --watch"
+    "test:loading": "clava dist/test/TestLoading.js"
   },
   "dependencies": {
     "@specs-feup/clava": "^3.0.1",
-    "@specs-feup/lara": "^1.0.0",
+    "@specs-feup/lara": "^3.0.2",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
