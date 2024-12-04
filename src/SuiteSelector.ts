@@ -3,7 +3,7 @@ import { BenchmarkSuite } from "./LiteBenchmarkLoader.js";
 export const SuiteSelector: Record<string, BenchmarkSuite> = {
     APPS: {
         name: "GenericApps",
-        path: "inputs/apps/",
+        path: "benchmarks/Apps/",
         apps: [
             "cluster-scenario",
             "disparity",
@@ -26,7 +26,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
     },
     AXBENCH: {
         name: "AxBench",
-        path: "inputs/clava-benchmarks/AxSuite/resources/",
+        path: "benchmarks/AxBench/",
         apps: [
             "blackscholes",
             "fft",
@@ -49,7 +49,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
     },
     CHSTONE: {
         name: "CHStone",
-        path: "inputs/clava-benchmarks/CHStone/lara/benchmark/",
+        path: "benchmarks/CHStone/",
         apps: [
             "adpcm",
             "aes",
@@ -81,8 +81,8 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
         flags: []
     },
     CORTEXSUITE_CORTEX: {
-        name: "CortexSuite",
-        path: "inputs/clava-benchmarks/CortexSuite/resources/",
+        name: "CortexSuite-Cortex",
+        path: "benchmarks/CortexSuite-Cortex/",
         apps: [
             "cortex-clustering-kmeans",
             "cortex-clustering-spectral",
@@ -120,8 +120,8 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
         flags: []
     },
     CORTEXSUITE_VISION: {
-        name: "CortexSuite",
-        path: "inputs/clava-benchmarks/CortexSuite/resources/",
+        name: "CortexSuite-Vision",
+        path: "benchmarks/CortexSuite-Vision/",
         apps: [
             "vision-disparity",
             "vision-localization",
@@ -150,7 +150,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
     },
     MACHSUITE: {
         name: "MachSuite",
-        path: "inputs/clava-benchmarks/MachSuite/lara/benchmark/",
+        path: "benchmarks/MachSuite/",
         apps: [
             "aes",
             "backprop",
@@ -197,7 +197,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
     },
     RODINIA: {
         name: "Rodinia",
-        path: "inputs/clava-benchmarks/Rodinia/resources/",
+        path: "benchmarks/Rodinia/",
         apps: [
             "backprop",
             "bfs",
@@ -250,7 +250,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
     },
     ROSETTA: {
         name: "Rosetta",
-        path: "inputs/clava-benchmarks/Rosetta/lara/benchmark/",
+        path: "benchmarks/Rosetta/",
         apps: [
             "3d-rendering",
             "digit-recognition",

@@ -1,0 +1,4 @@
+#pragma once
+
+// DYNAMICALLY DEFINE THESE USING CLAVA
+#define BOOKCASE
