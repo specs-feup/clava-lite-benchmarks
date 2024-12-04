@@ -21,18 +21,18 @@ export class LiteBenchmarkLoader {
         Clava.getData().setFlags(suite.flags.join(" "));
 
         if (!Io.isFolder(fullPath)) {
-            console.error(`[${chalk.yellowBright("BenchmarkLoader")}] Benchmark folder not found: ${fullPath}`);
+            LiteBenchmarkLoader.log(`Benchmark folder not found: ${fullPath}`);
             if (cachedPath === undefined) {
-                console.log(`[${chalk.yellowBright("BenchmarkLoader")}] Have you cloned the submodule github.com/specs-feup/clava-benchmarks?`);
+                LiteBenchmarkLoader.log(`Have you cloned the submodule github.com/specs-feup/clava-benchmarks?`);
             }
             else {
-                console.log("Cached path is invalid.");
+                LiteBenchmarkLoader.log("Cached path is invalid.");
             }
             return "<none>";
         }
 
         const sources = LiteBenchmarkLoader.readSourcesInFolder(fullPath);
-        console.log(`[${chalk.yellowBright("BenchmarkLoader")}] Found ${sources.length} files for ${app}`);
+        LiteBenchmarkLoader.log(`Found ${sources.length} files for ${app}`);
 
         Clava.pushAst(ClavaJoinPoints.program());
         for (const source of sources) {
@@ -55,11 +55,14 @@ export class LiteBenchmarkLoader {
                     }
                 }
             }
-
         } catch (err) {
-            console.error(`[${chalk.yellowBright("BenchmarkLoader")}] Error reading files:`, err);
+            LiteBenchmarkLoader.log(`Error reading files: ${err}`);
         }
         return sources;
+    }
+
+    private static log(message: string): void {
+        console.log(`[${chalk.yellowBright("BenchmarkLoader")}] ---------------------- ${message}`);
     }
 }
 

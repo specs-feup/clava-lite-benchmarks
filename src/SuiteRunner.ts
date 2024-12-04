@@ -10,7 +10,7 @@ export abstract class SuiteRunner {
         this.lineLength = lineLength;
     }
 
-    public runFlowForSuite(suite: BenchmarkSuite, apps: string[], config: Record<string, any>, disableCaching: boolean = true): boolean {
+    public runScriptForSuite(suite: BenchmarkSuite, apps: string[], config: Record<string, any>, disableCaching: boolean = true): boolean {
         for (const app of apps) {
             this.log(`Running ${this.getScriptName()} for app ${app} of benchmark suite ${suite.name}`);
             const cachedPath = `${config.outputDir}/${app}/src/trans`;
@@ -75,7 +75,7 @@ export abstract class SuiteRunner {
 
     protected log(msg: string): void {
         const header = chalk.yellowBright("SuiteRunner");
-        console.log(`[${header}] ${msg}`);
+        console.log(`[${header}] -------------------------- ${msg}`);
     }
 
     protected abstract getScriptName(): string;
