@@ -18,48 +18,45 @@ export abstract class SuiteRunner {
 
             let invalidCache = false;
             if (disableCaching) {
-                this.log(`Caching is disabled, loading full benchmark for app ${app}...`);
+                this.log(`Caching is disabled, loading original version of ${app}...`);
                 topFunctionName = LiteBenchmarkLoader.load(suite, app);
                 if (topFunctionName === "<none>") {
                     this.log(`Could not load app ${app}, skipping...`);
                     continue;
                 }
                 invalidCache = true;
-                this.log(`Loaded full benchmark for app ${app} with top function ${topFunctionName}`);
+                this.log(`Loaded original version of app ${app} with top function ${topFunctionName}`);
             }
             else {
-                this.log(`Trying to load cached app ${app} from ${cachedPath}...`);
+                this.log(`Trying to load cached version app ${app} from ${cachedPath}...`);
                 topFunctionName = LiteBenchmarkLoader.load(suite, app, cachedPath);
 
                 if (topFunctionName === "<none>") {
-                    this.log(`Could not load cached app ${app}, loading full benchmark instead`);
+                    this.log(`Could not load cached app ${app}, loading original version instead`);
                     invalidCache = true;
 
-                    this.log(`Loading full benchmark for app ${app}...`);
+                    this.log(`Loading original version of ${app}...`);
                     topFunctionName = LiteBenchmarkLoader.load(suite, app);
                     if (topFunctionName === "<none>") {
                         this.log(`Could not load app ${app}, skipping...`);
                         return false;
                     }
-                    this.log(`Loaded full benchmark for app ${app} with top function ${topFunctionName}`);
+                    this.log(`Loaded original version of app ${app} with top function ${topFunctionName}`);
                 }
                 else {
-                    this.log(`Loaded cached app ${app} with top function ${topFunctionName}`);
+                    this.log(`Loaded cached version of app ${app} with top function ${topFunctionName}`);
                 }
             }
 
             try {
-                if (invalidCache) {
-                    const success = this.runPrologue(app, topFunctionName, config);
-                    if (!success) {
-                        this.log(`Code transformation flow failed for app ${app}`);
-                        this.log("-".repeat(this.lineLength));
-                        continue;
-                    }
+                const success = this.runScript(app, topFunctionName, !invalidCache, config);
+                if (!success) {
+                    this.log(`${this.getScriptName()} failed for app ${app}`);
+                    this.log("-".repeat(this.lineLength));
                 }
-                this.runScript(app, topFunctionName, config);
-
-                this.log(`Finished running ${this.getScriptName()} flows for app ${app} of benchmark suite ${suite.name}`);
+                else {
+                    this.log(`Finished running ${this.getScriptName()} for app ${app} of benchmark suite ${suite.name}`);
+                }
 
             } catch (e) {
                 this.log((e instanceof Error) ? e.message : String(e));
@@ -83,7 +80,5 @@ export abstract class SuiteRunner {
 
     protected abstract getScriptName(): string;
 
-    protected abstract runPrologue(app: string, topFunctionName: string, config: Record<string, any>): boolean;
-
-    protected abstract runScript(app: string, topFunctionName: string, config: Record<string, any>): void;
+    protected abstract runScript(app: string, topFunctionName: string, isCached: boolean, config: Record<string, any>): boolean;
 }
