@@ -6,11 +6,13 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
         path: "apps/",
         apps: [
             "disparity",
-            "edgedetect"
+            "edgedetect",
+            "llama2"
         ],
         appDetails: {
             "disparity": { standard: "c11", topFunction: "top_level", input: "disparity" },
-            "edgedetect": { standard: "c++11", topFunction: "edge_detect", input: "edgedetect" }
+            "edgedetect": { standard: "c++11", topFunction: "edge_detect", input: "edgedetect" },
+            "llama2": { standard: "c11", topFunction: "generate", input: "llama2" }
         },
         flags: []
     },
