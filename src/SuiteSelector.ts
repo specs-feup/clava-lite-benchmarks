@@ -2,12 +2,23 @@ import { BenchmarkSuite } from "./LiteBenchmarkLoader.js";
 
 export const SuiteSelector: Record<string, BenchmarkSuite> = {
     APPS: {
-        name: "GenericApps",
-        path: "benchmarks/Apps/",
+        name: "Apps",
+        path: "apps/",
+        apps: [
+            "disparity",
+            "edgedetect"
+        ],
+        appDetails: {
+            "disparity": { standard: "c11", topFunction: "top_level", input: "disparity" },
+            "edgedetect": { standard: "c++11", topFunction: "edge_detect", input: "edgedetect" }
+        },
+        flags: []
+    },
+    APP_EDGECASES: {
+        name: "Edgecases",
+        path: "edgecases/",
         apps: [
             "cluster-scenario",
-            "disparity",
-            "edgedetect",
             "scenarioA",
             "scenarioB",
             "stresstest",
@@ -15,12 +26,10 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
         ],
         appDetails: {
             "cluster-scenario": { standard: "c++11", topFunction: "program", input: "cluster-scenario" },
-            "disparity": { standard: "c11", topFunction: "top_level", input: "disparity" },
-            "edgedetect": { standard: "c++11", topFunction: "edge_detect", input: "edgedetect" },
             "scenarioA": { standard: "c11", topFunction: "main", input: "scenarioA" },
             "scenarioB": { standard: "c11", topFunction: "scenario", input: "scenarioB" },
             "stresstest": { standard: "c++11", topFunction: "app_start", input: "stresstest" },
-            "trivial": { standard: "c11", topFunction: "main", input: "trivial" },
+            "trivial": { standard: "c11", topFunction: "main", input: "trivial" }
         },
         flags: []
     },

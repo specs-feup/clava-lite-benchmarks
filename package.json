@@ -17,7 +17,9 @@
     "./SuiteRunner": "./dist/src/SuiteRunner.js"
   },
   "files": [
-    "benchmarks/"
+    "apps/",
+    "benchmarks/",
+    "edgecases"
   ],
   "dependencies": {
     "@specs-feup/clava": "^3.0.1",

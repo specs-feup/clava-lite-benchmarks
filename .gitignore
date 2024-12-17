@@ -112,3 +112,15 @@ dist
 
 # TernJS port file
 .tern-port
+
+benchmarks/Llama2/inputs/stories110M.bin
+
+benchmarks/Llama2/inputs/stories15M.bin
+
+benchmarks/Llama2/inputs/stories42M.bin
+
+apps/llama2/inputs/stories110M.bin
+
+apps/llama2/inputs/stories15M.bin
+
+apps/llama2/inputs/stories42M.bin
