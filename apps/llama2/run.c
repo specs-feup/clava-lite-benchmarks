@@ -10,10 +10,14 @@
 #include <stdint.h>
 #if defined _WIN32
 #include "win.h"
-#else
+#elif defined __linux__
 #include <unistd.h>
 #include <sys/mman.h>
 #include <linux/time.h>
+#elif defined __APPLE__
+#include <unistd.h>
+#include <sys/mman.h>
+#include <mach/mach_time.h>
 #endif
 // ----------------------------------------------------------------------------
 // Transformer model
