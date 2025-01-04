@@ -14,7 +14,7 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
             "edgedetect": { standard: "c++11", topFunction: "edge_detect", input: "edgedetect" },
             "llama2": { standard: "c11", topFunction: "generate", input: "llama2" }
         },
-        flags: []
+        flags: ["-lm"]
     },
     APP_EDGECASES: {
         name: "Edgecases",

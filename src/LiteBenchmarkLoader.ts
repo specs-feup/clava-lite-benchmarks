@@ -18,7 +18,15 @@ export class LiteBenchmarkLoader {
         })();
 
         Clava.getData().setStandard(summary.standard);
+        this.log(`Selected standard: ${Clava.getStandard()}`);
+
         Clava.getData().setFlags(suite.flags.join(" "));
+        if (suite.flags.length > 0) {
+            this.log(`Selected flags: ${suite.flags.join(" ")}`);
+        }
+        else {
+            this.log(`No Clang flags were selected`);
+        }
 
         if (!Io.isFolder(fullPath)) {
             LiteBenchmarkLoader.log(`Benchmark folder not found: ${fullPath}`);
