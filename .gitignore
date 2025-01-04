@@ -124,3 +124,11 @@ apps/llama2/inputs/stories110M.bin
 apps/llama2/inputs/stories15M.bin
 
 apps/llama2/inputs/stories42M.bin
+
+apps/llama2/stories110M.bin
+
+apps/llama2/stories260K.bin
+
+apps/llama2/stories15M.bin
+
+apps/llama2/stories42M.bin

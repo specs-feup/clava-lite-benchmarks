@@ -1,5 +1,5 @@
 /* Inference for Llama-2 Transformer model in pure C */
-
+#define _POSIX_C_SOURCE 199309L
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -7,17 +7,13 @@
 #include <math.h>
 #include <string.h>
 #include <fcntl.h>
-#include <stdint.h>
 #if defined _WIN32
 #include "win.h"
-#elif defined __linux__
+#else
 #include <unistd.h>
 #include <sys/mman.h>
-#include <linux/time.h>
-#elif defined __APPLE__
-#include <unistd.h>
-#include <sys/mman.h>
-#include <mach/mach_time.h>
+#include <sys/time.h>
+#include <stdint.h>
 #endif
 // ----------------------------------------------------------------------------
 // Transformer model
@@ -549,7 +545,8 @@ void safe_printf(char *piece)
 int str_lookup(char *str, TokenIndex *sorted_vocab, int vocab_size)
 {
     // efficiently find the perfect match for str in vocab, return its index or -1 if not found
-    TokenIndex tok = {.str = str}; // acts as the key to search for
+    TokenIndex tok;
+    tok.str = str; // acts as the key to search for
     TokenIndex *res = bsearch(&tok, sorted_vocab, vocab_size, sizeof(TokenIndex), compare_tokens);
     return res != NULL ? res->id : -1;
 }
@@ -675,19 +672,17 @@ void encode(Tokenizer *t, char *text, int8_t bos, int8_t eos, int *tokens, int *
             }
         }
 
-        if (best_idx == -1)
+        if (best_idx != -1)
         {
-            break; // we couldn't find any more pairs to merge, so we're done
+            // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
+            tokens[best_idx] = best_id;
+            // delete token at position best_idx+1, shift the entire sequence back 1
+            for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
+            {
+                tokens[i] = tokens[i + 1];
+            }
+            (*n_tokens)--; // token length decreased
         }
-
-        // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
-        tokens[best_idx] = best_id;
-        // delete token at position best_idx+1, shift the entire sequence back 1
-        for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
-        {
-            tokens[i] = tokens[i + 1];
-        }
-        (*n_tokens)--; // token length decreased
     }
 
     // add optional EOS (=2) token, if desired
@@ -905,13 +900,14 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     }
 
     // start the main loop
-    long start = 0;               // used to time our code, only initialized after first iteration
+    long start = 0; // used to time our code, only initialized after first iteration
+    start = time_in_ms();
+
     int next;                     // will store the next token in the sequence
     int token = prompt_tokens[0]; // kick off with the first token in the prompt
     int pos = 0;                  // position in the sequence
     while (pos < steps)
     {
-
         // forward the transformer to get logits for the next token
         float *logits = forward(transformer, token, pos);
 
@@ -929,21 +925,13 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         pos++;
 
         // data-dependent terminating condition: the BOS (=1) token delimits sequences
-        if (next == 1)
+        if (next != 1)
         {
-            break;
-        }
-
-        // print the token as string, decode it with the Tokenizer object
-        char *piece = decode(tokenizer, token, next);
-        safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
-        fflush(stdout);
-        token = next;
-
-        // init the timer here because the first iteration can be slower
-        if (start == 0)
-        {
-            start = time_in_ms();
+            // print the token as string, decode it with the Tokenizer object
+            char *piece = decode(tokenizer, token, next);
+            safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
+            fflush(stdout);
+            token = next;
         }
     }
     printf("\n");
