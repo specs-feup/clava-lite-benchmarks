@@ -1215,7 +1215,7 @@ long time_in_ms()
 // ----------------------------------------------------------------------------
 // generation loop
 
-int cluster(
+int llama2_loop(
     // Transformer *transformer,
     // int transformer_fd,
     // float *transformer_data,
@@ -1463,7 +1463,7 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     // Region of interest
     // --------------------------------------------------------------------------------------------
     int rtr_val;
-    cluster(
+    llama2_loop(
         // -------------------------
         // transformer_fd,
         // transformer_data,
