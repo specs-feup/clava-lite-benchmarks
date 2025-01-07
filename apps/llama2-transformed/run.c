@@ -881,8 +881,100 @@ long time_in_ms()
 // ----------------------------------------------------------------------------
 // generation loop
 
+void cluster(
+    int transformer_fd,
+    float *transformer_data,
+    ssize_t transformer_file_size,
+    int transformer_config_dim,
+    int transformer_config_hidden_dim,
+    int transformer_config_n_layers,
+    int transformer_config_n_heads,
+    int transformer_config_n_kv_heads,
+    int transformer_config_seq_len,
+    int transformer_config_vocab_size,
+    float *transformer_weights_token_embedding_table,
+    float *transformer_weights_rms_att_weight,
+    float *transformer_weights_rms_ffn_weight,
+    float *transformer_weights_wq,
+    float *transformer_weights_wk,
+    float *transformer_weights_wv,
+    float *transformer_weights_wo,
+    float *transformer_weights_w1,
+    float *transformer_weights_w2,
+    float *transformer_weights_w3,
+    float *transformer_weights_rms_final_weight,
+    float *transformer_weights_wcls,
+    float *transformer_state_x,
+    float *transformer_state_xb,
+    float *transformer_state_xb2,
+    float *transformer_state_hb,
+    float *transformer_state_hb2,
+    float *transformer_state_q,
+    float *transformer_state_k,
+    float *transformer_state_v,
+    float *transformer_state_att,
+    float *transformer_state_logits,
+    float *transformer_state_key_cache,
+    float *transformer_state_value_cache,
+    int *prompt_tokens,
+    int num_prompt_tokens,
+    int *pos,
+    int steps)
+{
+    int next;                     // will store the next token in the sequence
+    int token = prompt_tokens[0]; // kick off with the first token in the prompt
+    while (pos < steps)
+    {
+        // forward the transformer to get logits for the next token
+        float *logits = forward(transformer, token, pos);
+
+        // advance the state machine
+        if (pos < num_prompt_tokens - 1)
+        {
+            // if we are still processing the input prompt, force the next prompt token
+            next = prompt_tokens[*pos + 1];
+        }
+        else
+        {
+            // otherwise sample the next token from the logits
+            next = sample(sampler, logits);
+        }
+        (*pos)++;
+
+        // data-dependent terminating condition: the BOS (=1) token delimits sequences
+        if (next != 1)
+        {
+            // print the token as string, decode it with the Tokenizer object
+            char *piece = decode(tokenizer, token, next);
+            safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
+            fflush(stdout);
+            token = next;
+        }
+    }
+    printf("\n");
+}
+
 void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, char *prompt, int steps)
 {
+    char *empty_prompt = "";
+    if (prompt == NULL)
+    {
+        prompt = empty_prompt;
+    }
+
+    // encode the (string) prompt into tokens sequence
+    int num_prompt_tokens = 0;
+    int *prompt_tokens = (int *)malloc((strlen(prompt) + 3) * sizeof(int)); // +3 for '\0', ?BOS, ?EOS
+    encode(tokenizer, prompt, 1, 0, prompt_tokens, &num_prompt_tokens);
+    if (num_prompt_tokens < 1)
+    {
+        fprintf(stderr, "something is wrong, expected at least 1 prompt token\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Region of interest
+    // --------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------
     // Struct disaggregation
     //--------------------------------------------------------------------------------
@@ -954,64 +1046,56 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     float sampler_probindex_prob = sampler_probindex->prob;
     int sampler_probindex_index = sampler_probindex->index;
     //--------------------------------------------------------------------------------
-    char *empty_prompt = "";
-    if (prompt == NULL)
-    {
-        prompt = empty_prompt;
-    }
-
-    // encode the (string) prompt into tokens sequence
-    int num_prompt_tokens = 0;
-    int *prompt_tokens = (int *)malloc((strlen(prompt) + 3) * sizeof(int)); // +3 for '\0', ?BOS, ?EOS
-    encode(tokenizer, prompt, 1, 0, prompt_tokens, &num_prompt_tokens);
-    if (num_prompt_tokens < 1)
-    {
-        fprintf(stderr, "something is wrong, expected at least 1 prompt token\n");
-        exit(EXIT_FAILURE);
-    }
 
     // start the main loop
     long start = 0; // used to time our code, only initialized after first iteration
     start = time_in_ms();
+    int pos = 0; // position in the sequence
 
-    int next;                     // will store the next token in the sequence
-    int token = prompt_tokens[0]; // kick off with the first token in the prompt
-    int pos = 0;                  // position in the sequence
-    while (pos < steps)
-    {
-        // forward the transformer to get logits for the next token
-        float *logits = forward(transformer, token, pos);
+    cluster(
+        transformer_fd,
+        transformer_data,
+        transformer_file_size,
+        transformer_config_dim,
+        transformer_config_hidden_dim,
+        transformer_config_n_layers,
+        transformer_config_n_heads,
+        transformer_config_n_kv_heads,
+        transformer_config_seq_len,
+        transformer_config_vocab_size,
+        transformer_weights_token_embedding_table,
+        transformer_weights_rms_att_weight,
+        transformer_weights_rms_ffn_weight,
+        transformer_weights_wq,
+        transformer_weights_wk,
+        transformer_weights_wv,
+        transformer_weights_wo,
+        transformer_weights_w1,
+        transformer_weights_w2,
+        transformer_weights_w3,
+        transformer_weights_rms_final_weight,
+        transformer_weights_wcls,
+        transformer_state_x,
+        transformer_state_xb,
+        transformer_state_xb2,
+        transformer_state_hb,
+        transformer_state_hb2,
+        transformer_state_q,
+        transformer_state_k,
+        transformer_state_v,
+        transformer_state_att,
+        transformer_state_logits,
+        transformer_state_key_cache,
+        transformer_state_value_cache,
+        prompt_tokens,
+        num_prompt_tokens,
+        &pos,
+        steps);
 
-        // advance the state machine
-        if (pos < num_prompt_tokens - 1)
-        {
-            // if we are still processing the input prompt, force the next prompt token
-            next = prompt_tokens[pos + 1];
-        }
-        else
-        {
-            // otherwise sample the next token from the logits
-            next = sample(sampler, logits);
-        }
-        pos++;
-
-        // data-dependent terminating condition: the BOS (=1) token delimits sequences
-        if (next != 1)
-        {
-            // print the token as string, decode it with the Tokenizer object
-            char *piece = decode(tokenizer, token, next);
-            safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
-            fflush(stdout);
-            token = next;
-        }
-    }
-    printf("\n");
-
-    // report achieved tok/s (pos-1 because the timer starts after first iteration)
     if (pos > 1)
     {
         long end = time_in_ms();
-        fprintf(stderr, "achieved tok/s: %f\n", (pos - 1) / (double)(end - start) * 1000);
+        fprintf(stderr, "achieved tok/s: %f\n", pos / (double)(end - start) * 1000);
     }
 
     free(prompt_tokens);
