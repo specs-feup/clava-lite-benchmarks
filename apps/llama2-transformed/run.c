@@ -417,6 +417,183 @@ float *forward(Transformer *transformer, int token, int pos)
     return s->logits;
 }
 
+float *forward_no_struct(
+    // int transformer_fd,
+    // float *transformer_data,
+    // ssize_t transformer_file_size,
+    int transformer_config_dim,
+    int transformer_config_hidden_dim,
+    int transformer_config_n_layers,
+    int transformer_config_n_heads,
+    int transformer_config_n_kv_heads,
+    int transformer_config_seq_len,
+    int transformer_config_vocab_size,
+    float *transformer_weights_token_embedding_table,
+    float *transformer_weights_rms_att_weight,
+    float *transformer_weights_rms_ffn_weight,
+    float *transformer_weights_wq,
+    float *transformer_weights_wk,
+    float *transformer_weights_wv,
+    float *transformer_weights_wo,
+    float *transformer_weights_w1,
+    float *transformer_weights_w2,
+    float *transformer_weights_w3,
+    float *transformer_weights_rms_final_weight,
+    float *transformer_weights_wcls,
+    float *transformer_state_x,
+    float *transformer_state_xb,
+    float *transformer_state_xb2,
+    float *transformer_state_hb,
+    float *transformer_state_hb2,
+    float *transformer_state_q,
+    float *transformer_state_k,
+    float *transformer_state_v,
+    float *transformer_state_att,
+    float *transformer_state_logits,
+    float *transformer_state_key_cache,
+    float *transformer_state_value_cache,
+    int token,
+    int pos)
+{
+    // a few convenience variables
+    float *x = transformer_state_x;
+    int dim = transformer_config_dim;
+    int kv_dim = (transformer_config_dim * transformer_config_n_kv_heads) / transformer_config_n_heads;
+    int kv_mul = transformer_config_n_heads / transformer_config_n_kv_heads; // integer multiplier of the kv sharing in multiquery
+    int hidden_dim = transformer_config_hidden_dim;
+    int head_size = dim / transformer_config_n_heads;
+
+    // copy the token embedding into x
+    float *content_row = transformer_weights_token_embedding_table + token * dim;
+    memcpy(x, content_row, dim * sizeof(*x));
+
+    // forward all the layers
+    for (unsigned long long l = 0; l < transformer_config_n_layers; l++)
+    {
+
+        // attention rmsnorm
+        rmsnorm(transformer_state_xb, x, transformer_weights_rms_att_weight + l * dim, dim);
+
+        // key and value point to the kv cache
+        int loff = l * transformer_config_seq_len * kv_dim; // kv cache layer offset for convenience
+        transformer_state_k = transformer_state_key_cache + loff + pos * kv_dim;
+        transformer_state_v = transformer_state_value_cache + loff + pos * kv_dim;
+
+        // qkv matmuls for this position
+        matmul(transformer_state_q, transformer_state_xb, transformer_weights_wq + l * dim * dim, dim, dim);
+        matmul(transformer_state_k, transformer_state_xb, transformer_weights_wk + l * dim * kv_dim, dim, kv_dim);
+        matmul(transformer_state_v, transformer_state_xb, transformer_weights_wv + l * dim * kv_dim, dim, kv_dim);
+
+        // RoPE relative positional encoding: complex-valued rotate q and k in each head
+        for (int i = 0; i < dim; i += 2)
+        {
+            int head_dim = i % head_size;
+            float freq = 1.0f / powf(10000.0f, head_dim / (float)head_size);
+            float val = pos * freq;
+            float fcr = cosf(val);
+            float fci = sinf(val);
+            int rotn = i < kv_dim ? 2 : 1; // how many vectors? 2 = q & k, 1 = q only
+            for (int v = 0; v < rotn; v++)
+            {
+                float *vec = v == 0 ? transformer_state_q : transformer_state_k; // the vector to rotate (query or key)
+                float v0 = vec[i];
+                float v1 = vec[i + 1];
+                vec[i] = v0 * fcr - v1 * fci;
+                vec[i + 1] = v0 * fci + v1 * fcr;
+            }
+        }
+
+        // multihead attention. iterate over all heads
+        int h;
+#pragma omp parallel for private(h)
+        for (h = 0; h < transformer_config_n_heads; h++)
+        {
+            // get the query vector for this head
+            float *q = transformer_state_q + h * head_size;
+            // attention scores for this head
+            float *att = transformer_state_att + h * transformer_config_seq_len;
+            // iterate over all timesteps, including the current one
+            for (int t = 0; t <= pos; t++)
+            {
+                // get the key vector for this head and at this timestep
+                float *k = transformer_state_key_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
+                // calculate the attention score as the dot product of q and k
+                float score = 0.0f;
+                for (int i = 0; i < head_size; i++)
+                {
+                    score += q[i] * k[i];
+                }
+                score /= sqrtf(head_size);
+                // save the score to the attention buffer
+                att[t] = score;
+            }
+
+            // softmax the scores to get attention weights, from 0..pos inclusively
+            softmax(att, pos + 1);
+
+            // weighted sum of the values, store back into xb
+            float *xb = transformer_state_xb + h * head_size;
+            memset(xb, 0, head_size * sizeof(float));
+            for (int t = 0; t <= pos; t++)
+            {
+                // get the value vector for this head and at this timestep
+                float *v = transformer_state_value_cache + loff + t * kv_dim + (h / kv_mul) * head_size;
+                // get the attention weight for this timestep
+                float a = att[t];
+                // accumulate the weighted value into xb
+                for (int i = 0; i < head_size; i++)
+                {
+                    xb[i] += a * v[i];
+                }
+            }
+        }
+
+        // final matmul to get the output of the attention
+        matmul(transformer_state_xb2, transformer_state_xb, transformer_weights_wo + l * dim * dim, dim, dim);
+
+        // residual connection back into x
+        for (int i = 0; i < dim; i++)
+        {
+            x[i] += transformer_state_xb2[i];
+        }
+
+        // ffn rmsnorm
+        rmsnorm(transformer_state_xb, x, transformer_weights_rms_ffn_weight + l * dim, dim);
+
+        // Now for FFN in PyTorch we have: self.w2(F.silu(self.w1(x)) * self.w3(x))
+        // first calculate self.w1(x) and self.w3(x)
+        matmul(transformer_state_hb, transformer_state_xb, transformer_weights_w1 + l * dim * hidden_dim, dim, hidden_dim);
+        matmul(transformer_state_hb2, transformer_state_xb, transformer_weights_w3 + l * dim * hidden_dim, dim, hidden_dim);
+
+        // SwiGLU non-linearity
+        for (int i = 0; i < hidden_dim; i++)
+        {
+            float val = transformer_state_hb[i];
+            // silu(x)=x*σ(x), where σ(x) is the logistic sigmoid
+            val *= (1.0f / (1.0f + expf(-val)));
+            // elementwise multiply with w3(x)
+            val *= transformer_state_hb2[i];
+            transformer_state_hb[i] = val;
+        }
+
+        // final matmul to get the output of the ffn
+        matmul(transformer_state_xb, transformer_state_hb, transformer_weights_w2 + l * dim * hidden_dim, hidden_dim, dim);
+
+        // residual connection
+        for (int i = 0; i < dim; i++)
+        {
+            x[i] += transformer_state_xb[i];
+        }
+    }
+
+    // final rmsnorm
+    rmsnorm(x, x, transformer_weights_rms_final_weight, dim);
+
+    // classifier into logits
+    matmul(transformer_state_logits, x, transformer_weights_wcls, transformer_config_dim, transformer_config_vocab_size);
+    return transformer_state_logits;
+}
+
 // ----------------------------------------------------------------------------
 // The Byte Pair Encoding (BPE) Tokenizer that translates strings <-> tokens
 
@@ -672,17 +849,19 @@ void encode(Tokenizer *t, char *text, int8_t bos, int8_t eos, int *tokens, int *
             }
         }
 
-        if (best_idx != -1)
+        if (best_idx == -1)
         {
-            // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
-            tokens[best_idx] = best_id;
-            // delete token at position best_idx+1, shift the entire sequence back 1
-            for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
-            {
-                tokens[i] = tokens[i + 1];
-            }
-            (*n_tokens)--; // token length decreased
+            break;
         }
+
+        // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
+        tokens[best_idx] = best_id;
+        // delete token at position best_idx+1, shift the entire sequence back 1
+        for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
+        {
+            tokens[i] = tokens[i + 1];
+        }
+        (*n_tokens)--; // token length decreased
     }
 
     // add optional EOS (=2) token, if desired
@@ -881,7 +1060,8 @@ long time_in_ms()
 // ----------------------------------------------------------------------------
 // generation loop
 
-void cluster(
+int cluster(
+    Transformer *transformer, // TO REMOVE
     int transformer_fd,
     float *transformer_data,
     ssize_t transformer_file_size,
@@ -916,30 +1096,79 @@ void cluster(
     float *transformer_state_logits,
     float *transformer_state_key_cache,
     float *transformer_state_value_cache,
+    Tokenizer *tokenizer, // TO REMOVE
+    char **tokenizer_vocab,
+    float *tokenizer_vocab_scores,
+    int tokenizer_vocab_size,
+    unsigned int tokenizer_max_token_length,
+    unsigned char *tokenizer_byte_pieces,
+    char *tokenizer_sorted_vocab_str,
+    int tokenizer_sorted_vocab_id,
+    Sampler *sampler, // TO REMOVE
+    int sampler_vocab_size,
+    float sampler_temperature,
+    float sampler_topp,
+    unsigned long long sampler_rng_state,
+    float sampler_probindex_prob,
+    int sampler_probindex_index,
+    // other args
     int *prompt_tokens,
     int num_prompt_tokens,
-    int *pos,
-    int steps)
+    int steps,
+    int *rtr_val)
 {
+    int pos = 0;
     int next;                     // will store the next token in the sequence
     int token = prompt_tokens[0]; // kick off with the first token in the prompt
     while (pos < steps)
     {
         // forward the transformer to get logits for the next token
-        float *logits = forward(transformer, token, pos);
+        float *logits = forward_no_struct(transformer_config_dim,
+                                          transformer_config_hidden_dim,
+                                          transformer_config_n_layers,
+                                          transformer_config_n_heads,
+                                          transformer_config_n_kv_heads,
+                                          transformer_config_seq_len,
+                                          transformer_config_vocab_size,
+                                          transformer_weights_token_embedding_table,
+                                          transformer_weights_rms_att_weight,
+                                          transformer_weights_rms_ffn_weight,
+                                          transformer_weights_wq,
+                                          transformer_weights_wk,
+                                          transformer_weights_wv,
+                                          transformer_weights_wo,
+                                          transformer_weights_w1,
+                                          transformer_weights_w2,
+                                          transformer_weights_w3,
+                                          transformer_weights_rms_final_weight,
+                                          transformer_weights_wcls,
+                                          transformer_state_x,
+                                          transformer_state_xb,
+                                          transformer_state_xb2,
+                                          transformer_state_hb,
+                                          transformer_state_hb2,
+                                          transformer_state_q,
+                                          transformer_state_k,
+                                          transformer_state_v,
+                                          transformer_state_att,
+                                          transformer_state_logits,
+                                          transformer_state_key_cache,
+                                          transformer_state_value_cache,
+                                          token,
+                                          pos);
 
         // advance the state machine
         if (pos < num_prompt_tokens - 1)
         {
             // if we are still processing the input prompt, force the next prompt token
-            next = prompt_tokens[*pos + 1];
+            next = prompt_tokens[pos + 1];
         }
         else
         {
             // otherwise sample the next token from the logits
             next = sample(sampler, logits);
         }
-        (*pos)++;
+        pos++;
 
         // data-dependent terminating condition: the BOS (=1) token delimits sequences
         if (next != 1)
@@ -952,6 +1181,7 @@ void cluster(
         }
     }
     printf("\n");
+    *rtr_val = pos;
 }
 
 void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, char *prompt, int steps)
@@ -961,7 +1191,6 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     {
         prompt = empty_prompt;
     }
-
     // encode the (string) prompt into tokens sequence
     int num_prompt_tokens = 0;
     int *prompt_tokens = (int *)malloc((strlen(prompt) + 3) * sizeof(int)); // +3 for '\0', ?BOS, ?EOS
@@ -972,9 +1201,6 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         exit(EXIT_FAILURE);
     }
 
-    // --------------------------------------------------------------------------------------------
-    // Region of interest
-    // --------------------------------------------------------------------------------------------
     //--------------------------------------------------------------------------------
     // Struct disaggregation
     //--------------------------------------------------------------------------------
@@ -1045,14 +1271,14 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     // *sampler_probindex
     float sampler_probindex_prob = sampler_probindex->prob;
     int sampler_probindex_index = sampler_probindex->index;
-    //--------------------------------------------------------------------------------
 
-    // start the main loop
-    long start = 0; // used to time our code, only initialized after first iteration
-    start = time_in_ms();
-    int pos = 0; // position in the sequence
-
+    long start = time_in_ms();
+    // --------------------------------------------------------------------------------------------
+    // Region of interest
+    // --------------------------------------------------------------------------------------------
+    int rtr_val;
     cluster(
+        transformer, // TO REMOVE
         transformer_fd,
         transformer_data,
         transformer_file_size,
@@ -1087,16 +1313,31 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         transformer_state_logits,
         transformer_state_key_cache,
         transformer_state_value_cache,
+        tokenizer, // TO REMOVE
+        tokenizer_vocab,
+        tokenizer_vocab_scores,
+        tokenizer_vocab_size,
+        tokenizer_max_token_length,
+        tokenizer_byte_pieces,
+        tokenizer_sorted_vocab_str,
+        tokenizer_sorted_vocab_id,
+        sampler, // TO REMOVE
+        sampler_vocab_size,
+        sampler_temperature,
+        sampler_topp,
+        sampler_rng_state,
+        sampler_probindex_prob,
+        sampler_probindex_index,
+        // other args
         prompt_tokens,
         num_prompt_tokens,
-        &pos,
-        steps);
-
-    if (pos > 1)
-    {
-        long end = time_in_ms();
-        fprintf(stderr, "achieved tok/s: %f\n", pos / (double)(end - start) * 1000);
-    }
+        steps,
+        &rtr_val);
+    // --------------------------------------------------------------------------------------------
+    // End of region of interest
+    // --------------------------------------------------------------------------------------------
+    long end = time_in_ms();
+    fprintf(stderr, "achieved tok/s: %f\n", rtr_val / (double)(end - start) * 1000);
 
     free(prompt_tokens);
 }

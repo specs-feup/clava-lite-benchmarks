@@ -672,17 +672,19 @@ void encode(Tokenizer *t, char *text, int8_t bos, int8_t eos, int *tokens, int *
             }
         }
 
-        if (best_idx != -1)
+        if (best_idx == -1)
         {
-            // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
-            tokens[best_idx] = best_id;
-            // delete token at position best_idx+1, shift the entire sequence back 1
-            for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
-            {
-                tokens[i] = tokens[i + 1];
-            }
-            (*n_tokens)--; // token length decreased
+            break; // no more merges possible
         }
+
+        // merge the consecutive pair (best_idx, best_idx+1) into new token best_id
+        tokens[best_idx] = best_id;
+        // delete token at position best_idx+1, shift the entire sequence back 1
+        for (int i = best_idx + 1; i < (*n_tokens - 1); i++)
+        {
+            tokens[i] = tokens[i + 1];
+        }
+        (*n_tokens)--; // token length decreased
     }
 
     // add optional EOS (=2) token, if desired
