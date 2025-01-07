@@ -883,6 +883,77 @@ long time_in_ms()
 
 void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, char *prompt, int steps)
 {
+    //--------------------------------------------------------------------------------
+    // Struct disaggregation
+    //--------------------------------------------------------------------------------
+    // *transformer
+    Config *transformer_config = &transformer->config;
+    TransformerWeights *transformer_weights = &transformer->weights;
+    RunState *transformer_state = &transformer->state;
+    int transformer_fd = transformer->fd;
+    float *transformer_data = transformer->data;
+    ssize_t transformer_file_size = transformer->file_size;
+
+    // *transformer_config
+    int transformer_config_dim = transformer_config->dim;
+    int transformer_config_hidden_dim = transformer_config->hidden_dim;
+    int transformer_config_n_layers = transformer_config->n_layers;
+    int transformer_config_n_heads = transformer_config->n_heads;
+    int transformer_config_n_kv_heads = transformer_config->n_kv_heads;
+    int transformer_config_seq_len = transformer_config->seq_len;
+    int transformer_config_vocab_size = transformer_config->vocab_size;
+
+    // *transformer_weights
+    float *transformer_weights_token_embedding_table = transformer_weights->token_embedding_table;
+    float *transformer_weights_rms_att_weight = transformer_weights->rms_att_weight;
+    float *transformer_weights_rms_ffn_weight = transformer_weights->rms_ffn_weight;
+    float *transformer_weights_wq = transformer_weights->wq;
+    float *transformer_weights_wk = transformer_weights->wk;
+    float *transformer_weights_wv = transformer_weights->wv;
+    float *transformer_weights_wo = transformer_weights->wo;
+    float *transformer_weights_w1 = transformer_weights->w1;
+    float *transformer_weights_w2 = transformer_weights->w2;
+    float *transformer_weights_w3 = transformer_weights->w3;
+    float *transformer_weights_rms_final_weight = transformer_weights->rms_final_weight;
+    float *transformer_weights_wcls = transformer_weights->wcls;
+
+    // *transformer_state
+    float *transformer_state_x = transformer_state->x;
+    float *transformer_state_xb = transformer_state->xb;
+    float *transformer_state_xb2 = transformer_state->xb2;
+    float *transformer_state_hb = transformer_state->hb;
+    float *transformer_state_hb2 = transformer_state->hb2;
+    float *transformer_state_q = transformer_state->q;
+    float *transformer_state_k = transformer_state->k;
+    float *transformer_state_v = transformer_state->v;
+    float *transformer_state_att = transformer_state->att;
+    float *transformer_state_logits = transformer_state->logits;
+    float *transformer_state_key_cache = transformer_state->key_cache;
+    float *transformer_state_value_cache = transformer_state->value_cache;
+
+    // *tokenizer
+    char **tokenizer_vocab = tokenizer->vocab;
+    float *tokenizer_vocab_scores = tokenizer->vocab_scores;
+    TokenIndex *tokenizer_sorted_vocab = tokenizer->sorted_vocab;
+    int tokenizer_vocab_size = tokenizer->vocab_size;
+    unsigned int tokenizer_max_token_length = tokenizer->max_token_length;
+    unsigned char *tokenizer_byte_pieces = tokenizer->byte_pieces;
+
+    // *tokenizer_sorted_vocab
+    char *tokenizer_sorted_vocab_str = tokenizer_sorted_vocab->str;
+    int tokenizer_sorted_vocab_id = tokenizer_sorted_vocab->id;
+
+    // *sampler
+    int sampler_vocab_size = sampler->vocab_size;
+    ProbIndex *sampler_probindex = sampler->probindex;
+    float sampler_temperature = sampler->temperature;
+    float sampler_topp = sampler->topp;
+    unsigned long long sampler_rng_state = sampler->rng_state;
+
+    // *sampler_probindex
+    float sampler_probindex_prob = sampler_probindex->prob;
+    int sampler_probindex_index = sampler_probindex->index;
+    //--------------------------------------------------------------------------------
     char *empty_prompt = "";
     if (prompt == NULL)
     {
