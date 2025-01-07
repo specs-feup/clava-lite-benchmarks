@@ -696,6 +696,54 @@ char *decode(Tokenizer *t, int prev_token, int token)
     return piece;
 }
 
+int specialized_sscanf(char *piece, unsigned char *byte_val)
+{
+    if (piece[0] != '<' || piece[1] != '0' || piece[2] != 'x' || piece[5] != '>')
+    {
+        return -1;
+    }
+
+    unsigned char value = 0;
+    for (int i = 3; i < 5; i++)
+    {
+        char c = piece[i];
+        unsigned char digit = 0;
+        if (c >= '0' && c <= '9')
+        {
+            digit = c - '0';
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            digit = c - 'A' + 10;
+        }
+        else
+        {
+            return -1;
+        }
+        value = (value << 4) | digit;
+    }
+    *byte_val = value;
+    return 1;
+}
+
+char *decode_no_struct(char **tokenizer_vocab, unsigned char *tokenizer_byte_pieces, int prev_token, int token)
+{
+    char *piece = tokenizer_vocab[token];
+    // following BOS (1) token, sentencepiece decoder strips any leading whitespace (see PR #89)
+    if (prev_token == 1 && piece[0] == ' ')
+    {
+        piece++;
+    }
+    // careful, some tokens designate raw bytes, and look like e.g. '<0x01>'
+    // parse this and convert and return the actual byte
+    unsigned char byte_val;
+    if (specialized_sscanf(piece, &byte_val) == 1)
+    {
+        piece = (char *)tokenizer_byte_pieces + byte_val * 2;
+    }
+    return piece;
+}
+
 void safe_printf(char *piece)
 {
     // piece might be a raw byte token, and we only want to print printable chars or whitespace
@@ -1168,10 +1216,10 @@ long time_in_ms()
 // generation loop
 
 int cluster(
-    Transformer *transformer, // TO REMOVE
-    int transformer_fd,
-    float *transformer_data,
-    ssize_t transformer_file_size,
+    // Transformer *transformer,
+    // int transformer_fd,
+    // float *transformer_data,
+    // ssize_t transformer_file_size,
     int transformer_config_dim,
     int transformer_config_hidden_dim,
     int transformer_config_n_layers,
@@ -1203,15 +1251,15 @@ int cluster(
     float *transformer_state_logits,
     float *transformer_state_key_cache,
     float *transformer_state_value_cache,
-    Tokenizer *tokenizer, // TO REMOVE
+    // Tokenizer *tokenizer,
     char **tokenizer_vocab,
-    float *tokenizer_vocab_scores,
-    int tokenizer_vocab_size,
-    unsigned int tokenizer_max_token_length,
+    // float *tokenizer_vocab_scores,
+    // int tokenizer_vocab_size,
+    // unsigned int tokenizer_max_token_length,
     unsigned char *tokenizer_byte_pieces,
-    char *tokenizer_sorted_vocab_str,
-    int tokenizer_sorted_vocab_id,
-    Sampler *sampler, // TO REMOVE
+    // char *tokenizer_sorted_vocab_str,
+    // int tokenizer_sorted_vocab_id,
+    //  Sampler *sampler,
     int sampler_vocab_size,
     float sampler_temperature,
     float sampler_topp,
@@ -1230,39 +1278,45 @@ int cluster(
     while (pos < steps)
     {
         // forward the transformer to get logits for the next token
-        float *logits = forward_no_struct(transformer_config_dim,
-                                          transformer_config_hidden_dim,
-                                          transformer_config_n_layers,
-                                          transformer_config_n_heads,
-                                          transformer_config_n_kv_heads,
-                                          transformer_config_seq_len,
-                                          transformer_config_vocab_size,
-                                          transformer_weights_token_embedding_table,
-                                          transformer_weights_rms_att_weight,
-                                          transformer_weights_rms_ffn_weight,
-                                          transformer_weights_wq,
-                                          transformer_weights_wk,
-                                          transformer_weights_wv,
-                                          transformer_weights_wo,
-                                          transformer_weights_w1,
-                                          transformer_weights_w2,
-                                          transformer_weights_w3,
-                                          transformer_weights_rms_final_weight,
-                                          transformer_weights_wcls,
-                                          transformer_state_x,
-                                          transformer_state_xb,
-                                          transformer_state_xb2,
-                                          transformer_state_hb,
-                                          transformer_state_hb2,
-                                          transformer_state_q,
-                                          transformer_state_k,
-                                          transformer_state_v,
-                                          transformer_state_att,
-                                          transformer_state_logits,
-                                          transformer_state_key_cache,
-                                          transformer_state_value_cache,
-                                          token,
-                                          pos);
+        float *logits = forward_no_struct(
+            // -------------------------
+            // transformer_fd,
+            // transformer_data,
+            // transformer_file_size,
+            transformer_config_dim,
+            transformer_config_hidden_dim,
+            transformer_config_n_layers,
+            transformer_config_n_heads,
+            transformer_config_n_kv_heads,
+            transformer_config_seq_len,
+            transformer_config_vocab_size,
+            transformer_weights_token_embedding_table,
+            transformer_weights_rms_att_weight,
+            transformer_weights_rms_ffn_weight,
+            transformer_weights_wq,
+            transformer_weights_wk,
+            transformer_weights_wv,
+            transformer_weights_wo,
+            transformer_weights_w1,
+            transformer_weights_w2,
+            transformer_weights_w3,
+            transformer_weights_rms_final_weight,
+            transformer_weights_wcls,
+            transformer_state_x,
+            transformer_state_xb,
+            transformer_state_xb2,
+            transformer_state_hb,
+            transformer_state_hb2,
+            transformer_state_q,
+            transformer_state_k,
+            transformer_state_v,
+            transformer_state_att,
+            transformer_state_logits,
+            transformer_state_key_cache,
+            transformer_state_value_cache,
+            // -------------------------
+            token,
+            pos);
 
         // advance the state machine
         if (pos < num_prompt_tokens - 1)
@@ -1273,13 +1327,16 @@ int cluster(
         else
         {
             // otherwise sample the next token from the logits
-            next = sample_no_struct(sampler_vocab_size,
-                                    sampler_temperature,
-                                    sampler_topp,
-                                    sampler_rng_state,
-                                    sampler_probindex_prob,
-                                    sampler_probindex_index,
-                                    logits);
+            next = sample_no_struct(
+                // -------------------------
+                sampler_vocab_size,
+                sampler_temperature,
+                sampler_topp,
+                sampler_rng_state,
+                sampler_probindex_prob,
+                sampler_probindex_index,
+                // -------------------------
+                logits);
         }
         pos++;
 
@@ -1287,7 +1344,18 @@ int cluster(
         if (next != 1)
         {
             // print the token as string, decode it with the Tokenizer object
-            char *piece = decode(tokenizer, token, next);
+            char *piece = decode_no_struct(
+                // -------------------------
+                tokenizer_vocab,
+                // tokenizer_vocab_scores,
+                // tokenizer_vocab_size,
+                // tokenizer_max_token_length,
+                tokenizer_byte_pieces,
+                // tokenizer_sorted_vocab_str,
+                // tokenizer_sorted_vocab_id,
+                // -------------------------
+                token,
+                next);
             safe_printf(piece); // same as printf("%s", piece), but skips "unsafe" bytes
             fflush(stdout);
             token = next;
@@ -1396,10 +1464,10 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     // --------------------------------------------------------------------------------------------
     int rtr_val;
     cluster(
-        transformer, // TO REMOVE
-        transformer_fd,
-        transformer_data,
-        transformer_file_size,
+        // -------------------------
+        // transformer_fd,
+        // transformer_data,
+        // transformer_file_size,
         transformer_config_dim,
         transformer_config_hidden_dim,
         transformer_config_n_layers,
@@ -1431,22 +1499,22 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         transformer_state_logits,
         transformer_state_key_cache,
         transformer_state_value_cache,
-        tokenizer, // TO REMOVE
+        // -------------------------
         tokenizer_vocab,
-        tokenizer_vocab_scores,
-        tokenizer_vocab_size,
-        tokenizer_max_token_length,
+        // tokenizer_vocab_scores,
+        // tokenizer_vocab_size,
+        // tokenizer_max_token_length,
         tokenizer_byte_pieces,
-        tokenizer_sorted_vocab_str,
-        tokenizer_sorted_vocab_id,
-        sampler, // TO REMOVE
+        // tokenizer_sorted_vocab_str,
+        // tokenizer_sorted_vocab_id,
+        //  -------------------------
         sampler_vocab_size,
         sampler_temperature,
         sampler_topp,
         sampler_rng_state,
         sampler_probindex_prob,
         sampler_probindex_index,
-        // other args
+        // -------------------------
         prompt_tokens,
         num_prompt_tokens,
         steps,
@@ -1455,6 +1523,8 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     // End of region of interest
     // --------------------------------------------------------------------------------------------
     long end = time_in_ms();
+    fprintf(stderr, "--------------------------------------------------\n");
+    fprintf(stderr, "total exec time: %ld ms\n", end - start);
     fprintf(stderr, "achieved tok/s: %f\n", rtr_val / (double)(end - start) * 1000);
 
     free(prompt_tokens);
