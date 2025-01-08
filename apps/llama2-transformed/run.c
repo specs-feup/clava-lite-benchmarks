@@ -726,9 +726,10 @@ int specialized_sscanf(char *piece, unsigned char *byte_val)
     return 1;
 }
 
-char *decode_no_struct(char **tokenizer_vocab, unsigned char *tokenizer_byte_pieces, int prev_token, int token)
+char *decode_no_struct(char *tokenizer_vocab, int tokenizer_max_token_length, unsigned char *tokenizer_byte_pieces, int prev_token, int token)
 {
-    char *piece = tokenizer_vocab[token];
+    //char *piece = tokenizer_vocab[token];
+    char *piece = tokenizer_vocab + (token * tokenizer_max_token_length);
     // following BOS (1) token, sentencepiece decoder strips any leading whitespace (see PR #89)
     if (prev_token == 1 && piece[0] == ' ')
     {
@@ -1215,7 +1216,7 @@ long time_in_ms()
 // ----------------------------------------------------------------------------
 // generation loop
 
-int llama2_loop(
+void llama2_loop(
     // Transformer *transformer,
     // int transformer_fd,
     // float *transformer_data,
@@ -1252,10 +1253,10 @@ int llama2_loop(
     float *transformer_state_key_cache,
     float *transformer_state_value_cache,
     // Tokenizer *tokenizer,
-    char **tokenizer_vocab,
+    char *tokenizer_vocab,
     // float *tokenizer_vocab_scores,
     // int tokenizer_vocab_size,
-    // unsigned int tokenizer_max_token_length,
+    unsigned int tokenizer_max_token_length,
     unsigned char *tokenizer_byte_pieces,
     // char *tokenizer_sorted_vocab_str,
     // int tokenizer_sorted_vocab_id,
@@ -1349,7 +1350,7 @@ int llama2_loop(
                 tokenizer_vocab,
                 // tokenizer_vocab_scores,
                 // tokenizer_vocab_size,
-                // tokenizer_max_token_length,
+                tokenizer_max_token_length,
                 tokenizer_byte_pieces,
                 // tokenizer_sorted_vocab_str,
                 // tokenizer_sorted_vocab_id,
@@ -1431,13 +1432,17 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     float *transformer_state_value_cache = transformer_state->value_cache;
 
     // *tokenizer
-    char **tokenizer_vocab = tokenizer->vocab;
     float *tokenizer_vocab_scores = tokenizer->vocab_scores;
     TokenIndex *tokenizer_sorted_vocab = tokenizer->sorted_vocab;
     int tokenizer_vocab_size = tokenizer->vocab_size;
     unsigned int tokenizer_max_token_length = tokenizer->max_token_length;
     unsigned char *tokenizer_byte_pieces = tokenizer->byte_pieces;
-
+    char *tokenizer_vocab = calloc(tokenizer_max_token_length * tokenizer_vocab_size, sizeof(char));
+    for (int i = 0; i < tokenizer_vocab_size; i++) {
+        int offset = i * tokenizer_max_token_length;
+        strcpy(tokenizer_vocab + offset, tokenizer->vocab[i]);                
+    }
+    
     // *tokenizer_sorted_vocab
     char *tokenizer_sorted_vocab_str = tokenizer_sorted_vocab->str;
     int tokenizer_sorted_vocab_id = tokenizer_sorted_vocab->id;
@@ -1503,7 +1508,7 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
         tokenizer_vocab,
         // tokenizer_vocab_scores,
         // tokenizer_vocab_size,
-        // tokenizer_max_token_length,
+        tokenizer_max_token_length,
         tokenizer_byte_pieces,
         // tokenizer_sorted_vocab_str,
         // tokenizer_sorted_vocab_id,
