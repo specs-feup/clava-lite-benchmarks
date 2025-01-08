@@ -728,7 +728,7 @@ int specialized_sscanf(char *piece, unsigned char *byte_val)
 
 char *decode_no_struct(char *tokenizer_vocab, int tokenizer_max_token_length, unsigned char *tokenizer_byte_pieces, int prev_token, int token)
 {
-    //char *piece = tokenizer_vocab[token];
+    // char *piece = tokenizer_vocab[token];
     char *piece = tokenizer_vocab + (token * tokenizer_max_token_length);
     // following BOS (1) token, sentencepiece decoder strips any leading whitespace (see PR #89)
     if (prev_token == 1 && piece[0] == ' ')
@@ -1216,8 +1216,119 @@ long time_in_ms()
 // ----------------------------------------------------------------------------
 // generation loop
 
+void llama2_iteration(
+    // -------------------------
+    int transformer_config_dim,
+    int transformer_config_hidden_dim,
+    int transformer_config_n_layers,
+    int transformer_config_n_heads,
+    int transformer_config_n_kv_heads,
+    int transformer_config_seq_len,
+    int transformer_config_vocab_size,
+    float *transformer_weights_token_embedding_table,
+    float *transformer_weights_rms_att_weight,
+    float *transformer_weights_rms_ffn_weight,
+    float *transformer_weights_wq,
+    float *transformer_weights_wk,
+    float *transformer_weights_wv,
+    float *transformer_weights_wo,
+    float *transformer_weights_w1,
+    float *transformer_weights_w2,
+    float *transformer_weights_w3,
+    float *transformer_weights_rms_final_weight,
+    float *transformer_weights_wcls,
+    float *transformer_state_x,
+    float *transformer_state_xb,
+    float *transformer_state_xb2,
+    float *transformer_state_hb,
+    float *transformer_state_hb2,
+    float *transformer_state_q,
+    float *transformer_state_k,
+    float *transformer_state_v,
+    float *transformer_state_att,
+    float *transformer_state_logits,
+    float *transformer_state_key_cache,
+    float *transformer_state_value_cache,
+    // -------------------------
+    int sampler_vocab_size,
+    float sampler_temperature,
+    float sampler_topp,
+    unsigned long long sampler_rng_state,
+    float *sampler_probindex_prob,
+    int *sampler_probindex_index,
+    // other args
+    int token,
+    int num_prompt_tokens,
+    int *prompt_tokens,
+    int *next,
+    int *pos)
+{
+    // forward the transformer to get logits for the next token
+    float *logits = forward_no_struct(
+        // -------------------------
+        // transformer_fd,
+        // transformer_data,
+        // transformer_file_size,
+        transformer_config_dim,
+        transformer_config_hidden_dim,
+        transformer_config_n_layers,
+        transformer_config_n_heads,
+        transformer_config_n_kv_heads,
+        transformer_config_seq_len,
+        transformer_config_vocab_size,
+        transformer_weights_token_embedding_table,
+        transformer_weights_rms_att_weight,
+        transformer_weights_rms_ffn_weight,
+        transformer_weights_wq,
+        transformer_weights_wk,
+        transformer_weights_wv,
+        transformer_weights_wo,
+        transformer_weights_w1,
+        transformer_weights_w2,
+        transformer_weights_w3,
+        transformer_weights_rms_final_weight,
+        transformer_weights_wcls,
+        transformer_state_x,
+        transformer_state_xb,
+        transformer_state_xb2,
+        transformer_state_hb,
+        transformer_state_hb2,
+        transformer_state_q,
+        transformer_state_k,
+        transformer_state_v,
+        transformer_state_att,
+        transformer_state_logits,
+        transformer_state_key_cache,
+        transformer_state_value_cache,
+        // -------------------------
+        token,
+        *pos);
+
+    // advance the state machine
+    if ((*pos) < num_prompt_tokens - 1)
+    {
+        // if we are still processing the input prompt, force the next prompt token
+        *next = prompt_tokens[(*pos) + 1];
+    }
+    else
+    {
+        // otherwise sample the next token from the logits
+        *next = sample_no_struct(
+            // -------------------------
+            sampler_vocab_size,
+            sampler_temperature,
+            sampler_topp,
+            sampler_rng_state,
+            sampler_probindex_prob,
+            sampler_probindex_index,
+            // -------------------------
+            logits);
+    }
+    (*pos)++;
+}
+
 void llama2_loop(
-    // Transformer *transformer,
+    // -------------------------
     // int transformer_fd,
     // float *transformer_data,
     // ssize_t transformer_file_size,
@@ -1252,7 +1363,7 @@ void llama2_loop(
     float *transformer_state_logits,
     float *transformer_state_key_cache,
     float *transformer_state_value_cache,
-    // Tokenizer *tokenizer,
+    // -------------------------
     char *tokenizer_vocab,
     // float *tokenizer_vocab_scores,
     // int tokenizer_vocab_size,
@@ -1260,7 +1371,7 @@ void llama2_loop(
     unsigned char *tokenizer_byte_pieces,
     // char *tokenizer_sorted_vocab_str,
     // int tokenizer_sorted_vocab_id,
-    //  Sampler *sampler,
+    // -------------------------
     int sampler_vocab_size,
     float sampler_temperature,
     float sampler_topp,
@@ -1278,12 +1389,8 @@ void llama2_loop(
     int token = prompt_tokens[0]; // kick off with the first token in the prompt
     while (pos < steps)
     {
-        // forward the transformer to get logits for the next token
-        float *logits = forward_no_struct(
+        llama2_iteration(
             // -------------------------
-            // transformer_fd,
-            // transformer_data,
-            // transformer_file_size,
             transformer_config_dim,
             transformer_config_hidden_dim,
             transformer_config_n_layers,
@@ -1316,32 +1423,18 @@ void llama2_loop(
             transformer_state_key_cache,
             transformer_state_value_cache,
             // -------------------------
+            sampler_vocab_size,
+            sampler_temperature,
+            sampler_topp,
+            sampler_rng_state,
+            sampler_probindex_prob,
+            sampler_probindex_index,
+            // other args
             token,
-            pos);
-
-        // advance the state machine
-        if (pos < num_prompt_tokens - 1)
-        {
-            // if we are still processing the input prompt, force the next prompt token
-            next = prompt_tokens[pos + 1];
-        }
-        else
-        {
-            // otherwise sample the next token from the logits
-            next = sample_no_struct(
-                // -------------------------
-                sampler_vocab_size,
-                sampler_temperature,
-                sampler_topp,
-                sampler_rng_state,
-                sampler_probindex_prob,
-                sampler_probindex_index,
-                // -------------------------
-                logits);
-        }
-        pos++;
-
-        // data-dependent terminating condition: the BOS (=1) token delimits sequences
+            num_prompt_tokens,
+            prompt_tokens,
+            &next,
+            &pos);
         if (next != 1)
         {
             // print the token as string, decode it with the Tokenizer object
@@ -1438,11 +1531,12 @@ void generate(Transformer *transformer, Tokenizer *tokenizer, Sampler *sampler, 
     unsigned int tokenizer_max_token_length = tokenizer->max_token_length;
     unsigned char *tokenizer_byte_pieces = tokenizer->byte_pieces;
     char *tokenizer_vocab = calloc(tokenizer_max_token_length * tokenizer_vocab_size, sizeof(char));
-    for (int i = 0; i < tokenizer_vocab_size; i++) {
+    for (int i = 0; i < tokenizer_vocab_size; i++)
+    {
         int offset = i * tokenizer_max_token_length;
-        strcpy(tokenizer_vocab + offset, tokenizer->vocab[i]);                
+        strcpy(tokenizer_vocab + offset, tokenizer->vocab[i]);
     }
-    
+
     // *tokenizer_sorted_vocab
     char *tokenizer_sorted_vocab_str = tokenizer_sorted_vocab->str;
     int tokenizer_sorted_vocab_id = tokenizer_sorted_vocab->id;
