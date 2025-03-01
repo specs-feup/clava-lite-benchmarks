@@ -1,7 +1,7 @@
 {
-  "name": "clava-lite-benchmarks",
+  "name": "@specs-feup/clava-lite-benchmarks",
   "version": "1.0.0",
-  "author": "tiagolascasas",
+  "author": "Tiago Lascasas Santos <tiagolascasas@outlook.com> (https://tiagolascasas.dev)",
   "description": "A collection of applications and benchmark suites used as testing inputs to several Clava NPM packages",
   "type": "module",
   "scripts": {
@@ -22,8 +22,8 @@
     "edgecases"
   ],
   "dependencies": {
-    "@specs-feup/clava": "^3.0.1",
-    "@specs-feup/lara": "^3.0.2",
+    "@specs-feup/clava": "^3.0.8",
+    "@specs-feup/lara": "^3.0.5",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
