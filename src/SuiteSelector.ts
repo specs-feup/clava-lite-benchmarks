@@ -259,5 +259,18 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
             "spam-filter": { standard: "c++11", topFunction: "SgdLR_sw", alternateTopFunction: "main" }
         },
         flags: ["-D SW"]
+    },
+    SPEC2017: {
+        name: "SPEC2017",
+        path: "benchmarks/SPEC2017/",
+        apps: [
+            "519.lbm_r",
+            "531.deepsjeng_r"
+        ],
+        appDetails: {
+            "519.lbm_r": { standard: "c11", topFunction: "main", input: "519.lbm_r" },
+            "531.deepsjeng_r": { standard: "c++11", topFunction: "main", input: "531.deepsjeng_r" }
+        },
+        flags: ["-lm"]
     }
 } as const;
