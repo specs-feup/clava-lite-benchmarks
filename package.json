@@ -9,7 +9,9 @@
     "build:watch": "tsc --watch",
     "lint": "eslint .",
     "docs": "typedoc",
-    "test:loading": "clava dist/test/TestLoading.js"
+    "test:app": "npx clava classic dist/test/TestLoadApp.js",
+    "test:rosetta": "npx clava classic  dist/test/TestLoadRosetta.js",
+    "test:spec": "npx clava classic  dist/test/TestLoadSPEC.js"
   },
   "exports": {
     "./LiteBenchmarkLoader": "./dist/src/LiteBenchmarkLoader.js",

@@ -264,12 +264,12 @@ export const SuiteSelector: Record<string, BenchmarkSuite> = {
         name: "SPEC2017",
         path: "benchmarks/SPEC2017/",
         apps: [
-            "519.lbm_r",
-            "531.deepsjeng_r"
+            "519_lbm_r",
+            "531_deepsjeng_r"
         ],
         appDetails: {
-            "519.lbm_r": { standard: "c11", topFunction: "main", input: "519.lbm_r" },
-            "531.deepsjeng_r": { standard: "c++11", topFunction: "main", input: "531.deepsjeng_r" }
+            "519_lbm_r": { standard: "c11", topFunction: "main", input: "519.lbm_r" },
+            "531_deepsjeng_r": { standard: "c++11", topFunction: "main", input: "531.deepsjeng_r" }
         },
         flags: ["-lm"]
     }
