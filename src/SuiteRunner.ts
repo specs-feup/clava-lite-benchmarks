@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 import chalk from "chalk";
-import { BenchmarkSuite, LiteBenchmarkLoader } from "./LiteBenchmarkLoader.js";
+import { BenchmarkSuite, loadApp } from "./LiteBenchmarkLoader.js";
 
 export abstract class SuiteRunner {
     private lineLength;
@@ -19,7 +19,7 @@ export abstract class SuiteRunner {
             let invalidCache = false;
             if (disableCaching) {
                 this.log(`Caching is disabled, loading original version of ${app}...`);
-                topFunctionName = LiteBenchmarkLoader.load(suite, app);
+                topFunctionName = loadApp(suite, app);
                 if (topFunctionName === "<none>") {
                     this.log(`Could not load app ${app}, skipping...`);
                     continue;
@@ -29,14 +29,14 @@ export abstract class SuiteRunner {
             }
             else {
                 this.log(`Trying to load cached version app ${app} from ${cachedPath}...`);
-                topFunctionName = LiteBenchmarkLoader.load(suite, app, cachedPath);
+                topFunctionName = loadApp(suite, app, cachedPath);
 
                 if (topFunctionName === "<none>") {
                     this.log(`Could not load cached app ${app}, loading original version instead`);
                     invalidCache = true;
 
                     this.log(`Loading original version of ${app}...`);
-                    topFunctionName = LiteBenchmarkLoader.load(suite, app);
+                    topFunctionName = loadApp(suite, app);
                     if (topFunctionName === "<none>") {
                         this.log(`Could not load app ${app}, skipping...`);
                         return false;
