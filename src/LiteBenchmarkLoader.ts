@@ -7,17 +7,20 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 export class LiteBenchmarkLoader {
-    static load(suite: BenchmarkSuite, app: string, cachedPath?: string): string {
-        const summary = suite.appDetails[app];
+    static appList(suite: BenchmarkSuite): string[] {
+        return Object.keys(suite.apps);
+    }
+
+    static loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPath?: string): string {
 
         const fullPath = cachedPath != undefined ? cachedPath : (() => {
             const __filename = fileURLToPath(import.meta.url);
             const __dirname = path.dirname(__filename);
 
-            return path.join(__dirname, "../../", `${suite.path}${app}`);
+            return path.join(__dirname, "../../", `${suite.path}${appSummary.canonicalName}`);
         })();
 
-        Clava.getData().setStandard(summary.standard);
+        Clava.getData().setStandard(appSummary.standard);
         this.log(`Selected standard: ${Clava.getStandard()}`);
 
         Clava.getData().setFlags(suite.flags.join(" "));
@@ -40,7 +43,7 @@ export class LiteBenchmarkLoader {
         }
 
         const sources = LiteBenchmarkLoader.readSourcesInFolder(fullPath);
-        LiteBenchmarkLoader.log(`Found ${sources.length} files for ${app}`);
+        LiteBenchmarkLoader.log(`Found ${sources.length} files for ${appSummary.canonicalName}`);
 
         Clava.pushAst(ClavaJoinPoints.program());
         for (const source of sources) {
@@ -48,7 +51,7 @@ export class LiteBenchmarkLoader {
         }
         Clava.rebuild();
 
-        return summary.topFunction;
+        return appSummary.topFunction;
     }
 
     public static readSourcesInFolder(folderPath: string): string[] {
@@ -77,14 +80,14 @@ export class LiteBenchmarkLoader {
 export type BenchmarkSuite = {
     name: string,
     path: string,
-    apps: string[],
-    appDetails: Record<string, AppSummary>,
-    flags: string[]
+    apps: { [key: string]: AppSummary },
+    flags: string[],
 };
 
 export type AppSummary = {
+    canonicalName: string,
     standard: string,
     topFunction: string,
-    input?: string,
-    alternateTopFunction?: string
+    altTopFunction?: string
+    inputs?: string,
 }
