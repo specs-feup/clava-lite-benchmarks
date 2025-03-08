@@ -1,22 +1,19 @@
 import { FunctionJp } from "@specs-feup/clava/api/Joinpoints.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
 import { ROSETTA } from "../src/BenchmarkSuites.js";
-import { loadApp } from "../src/LiteBenchmarkLoader.js";
+import { loadSuite } from "../src/LiteBenchmarkLoader.js";
 
-let suite = ROSETTA;
-let app = "spam-filter";
-loadApp(suite, app);
+const loader = loadSuite(ROSETTA);
 
-for (const fun of Query.search(FunctionJp)) {
-    console.log(fun.name);
+for (const res of loader) {
+    if (res.success) {
+        console.log(`Loaded app: ${res.app}, top function: ${res.topFunction}`);
+
+        for (const fun of Query.search(FunctionJp)) {
+            console.log(fun.name);
+        }
+    }
+    else {
+        console.log(`Failed to load app: ${res.app}`);
+    }
 }
-
-// suite = SuiteSelector.ROSETTA;
-// for (const app of suite.apps) {
-//     LiteBenchmarkLoader.load(suite, app);
-
-//     console.log(`Functions of app ${app} from benchmark suite ${suite.name}:`);
-//     for (const fun of Query.search(FunctionJp)) {
-//         console.log(fun.name);
-//     }
-// }

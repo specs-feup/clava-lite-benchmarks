@@ -21,18 +21,26 @@ export type AppSummary = {
     inputs?: string,
 }
 
+export type LoadResult = {
+    success: boolean,
+    app: string,
+    topFunction: string
+}
+
 export function appList(suite: BenchmarkSuite): string[] {
     return Object.keys(suite.apps);
 }
 
-export function* loadSuite(suite: BenchmarkSuite): Generator<[string, string]> {
+export function* loadSuite(suite: BenchmarkSuite): Generator<LoadResult> {
     for (const app of appList(suite)) {
-        const topFunction = loadApp(suite, suite.apps[app]);
-        yield [app, topFunction];
+        log(`Loading app: ${app}`);
+
+        const res = loadApp(suite, suite.apps[app]);
+        yield res;
     }
 }
 
-export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, cachedPath?: string): string {
+export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, cachedPath?: string): LoadResult {
     if (typeof appSummary === "string") {
         appSummary = suite.apps[appSummary];
     }
@@ -63,7 +71,11 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, 
         else {
             log("Cached path is invalid.");
         }
-        return "<none>";
+        return {
+            success: false,
+            app: appSummary.canonicalName,
+            topFunction: "<none>"
+        };
     }
 
     const sources = readSourcesInFolder(fullPath);
@@ -75,7 +87,11 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, 
     }
     Clava.rebuild();
 
-    return appSummary.topFunction;
+    return {
+        success: true,
+        app: appSummary.canonicalName,
+        topFunction: appSummary.topFunction
+    };
 }
 
 function readSourcesInFolder(folderPath: string): string[] {
