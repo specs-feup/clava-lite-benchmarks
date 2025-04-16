@@ -5,6 +5,7 @@ export const APPS: BenchmarkSuite = {
     path: "apps/",
     apps: {
         "disparity": { standard: "c11", topFunction: "top_level", canonicalName: "disparity" },
+        "doom": { standard: "c89", topFunction: "main", canonicalName: "doom" },
         "edgedetect": { standard: "c++11", topFunction: "edge_detect", canonicalName: "edgedetect" },
         "llama2": { standard: "c11", topFunction: "generate", canonicalName: "llama2" },
         "llama2-transformed": { standard: "c11", topFunction: "llama2_loop", canonicalName: "llama2-transformed" }
