@@ -16,9 +16,10 @@
 //	Cheat code checking.
 //
 
-
 #ifndef __M_CHEAT__
 #define __M_CHEAT__
+
+#include "doomtype.h"
 
 //
 // CHEAT SEQUENCE PACKAGE
@@ -27,7 +28,7 @@
 // declaring a cheat
 
 #define CHEAT(value, parameters) \
-    { value, sizeof(value) - 1, parameters, 0, 0, "" }
+    {value, sizeof(value) - 1, parameters, 0, 0, ""}
 
 #define MAX_CHEAT_LEN 25
 #define MAX_CHEAT_PARAMS 5
@@ -47,16 +48,10 @@ typedef struct
     char parameter_buf[MAX_CHEAT_PARAMS];
 } cheatseq_t;
 
-int
-cht_CheckCheat
-( cheatseq_t*		cht,
-  char			key );
+int cht_CheckCheat(cheatseq_t *cht,
+                   char key);
 
-
-void
-cht_GetParam
-( cheatseq_t*		cht,
-  char*			buffer );
-
+void cht_GetParam(cheatseq_t *cht,
+                  char *buffer);
 
 #endif
