@@ -66,9 +66,6 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, 
     if (!Io.isFolder(fullPath)) {
         log(`Benchmark folder not found: ${fullPath}`);
         if (cachedPath === undefined) {
-            log(`Have you cloned the submodule github.com/specs-feup/clava-benchmarks?`);
-        }
-        else {
             log("Cached path is invalid.");
         }
         return {

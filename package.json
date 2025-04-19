@@ -11,6 +11,7 @@
     "docs": "typedoc",
     "test:app": "npx clava classic dist/test/TestLoadApp.js",
     "test:rosetta": "npx clava classic  dist/test/TestLoadRosetta.js",
+    "test:rosetta-single": "npx clava classic  dist/test/TestLoadRosettaSingle.js",
     "test:spec": "npx clava classic  dist/test/TestLoadSPEC.js"
   },
   "exports": {
