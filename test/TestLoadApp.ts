@@ -1,11 +1,11 @@
 import { FunctionJp } from "@specs-feup/clava/api/Joinpoints.js";
+import { LiteBenchmarkLoader } from "../src/LiteBenchmarkLoader.js";
+import { SuiteSelector } from "../src/SuiteSelector.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
-import { loadApp } from "../src/LiteBenchmarkLoader.js";
-import { APPS } from "../src/BenchmarkSuites.js";
 
-let suite = APPS;
-let app = "edgedetect"
-loadApp(suite, app);
+let suite = SuiteSelector.APPS;
+let app = "llama2";
+LiteBenchmarkLoader.load(suite, app);
 
 for (const fun of Query.search(FunctionJp)) {
     console.log(fun.name);
