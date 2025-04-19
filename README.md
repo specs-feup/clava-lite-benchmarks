@@ -20,3 +20,9 @@ for (const app of suite.apps) {
     }
 }
 ```
+
+## Licenses
+
+This Clava extension is licensed under LGPL-3.0 License. You can use, modify, and distribute it under the terms of this license.
+
+The included benchmark applications have different licenses, which are provided alongside their code.
