@@ -6,7 +6,7 @@ import { BenchmarkSuite, loadApp, LoadResult } from "./LiteBenchmarkLoader.js";
 export abstract class SuiteRunner {
     private lineLength;
 
-    constructor(lineLength: number = 58) {
+    constructor(lineLength: number = 60) {
         this.lineLength = lineLength;
     }
 
