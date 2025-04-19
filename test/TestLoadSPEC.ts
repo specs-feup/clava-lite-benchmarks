@@ -1,11 +1,11 @@
 import { FunctionJp } from "@specs-feup/clava/api/Joinpoints.js";
+import { LiteBenchmarkLoader } from "../src/LiteBenchmarkLoader.js";
+import { SuiteSelector } from "../src/SuiteSelector.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
-import { SPEC2017 } from "../src/BenchmarkSuites.js";
-import { loadApp } from "../src/LiteBenchmarkLoader.js";
 
-let suite = SPEC2017;
+let suite = SuiteSelector.SPEC2017;
 let app = "519_lbm_r";
-loadApp(suite, app);
+LiteBenchmarkLoader.load(suite, app);
 
 for (const fun of Query.search(FunctionJp)) {
     console.log(fun.name);
