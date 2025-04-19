@@ -144,7 +144,3 @@ apps/llama2-transformed/stories42M.bin
 apps/llama2-transformed/llama2
 
 apps/llama2/llama2
-
-benchmarks/SPEC2017/519.lbm_r/
-
-benchmarks/SPEC2017/531.deepsjeng_r/
