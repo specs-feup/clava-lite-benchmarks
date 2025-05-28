@@ -14,13 +14,18 @@ export abstract class SuiteRunner {
         for (const app of apps) {
             this.log(`Running ${this.getScriptName()} for app ${app} of benchmark suite ${suite.name}`);
             const cachedPath = `${config.outputDir}/${app}/src/trans`;
+            const appSummary = suite.apps[app];
+            if (!appSummary) {
+                this.log(`App ${app} not found in benchmark suite ${suite.name}, skipping...`);
+                return false
+            }
 
             let invalidCache = false;
             let res: LoadResult;
 
             if (disableCaching) {
                 this.log(`Caching is disabled, loading original version of ${app}...`);
-                res = loadApp(suite, app);
+                res = loadApp(suite, appSummary);
 
                 if (!res.success) {
                     this.log(`Could not load app ${app}, skipping...`);
@@ -31,14 +36,14 @@ export abstract class SuiteRunner {
             }
             else {
                 this.log(`Trying to load cached version app ${app} from ${cachedPath}...`);
-                res = loadApp(suite, app, cachedPath);
+                res = loadApp(suite, appSummary, cachedPath);
 
                 if (!res.success) {
                     this.log(`Could not load cached app ${app}, loading original version instead`);
                     invalidCache = true;
 
                     this.log(`Loading original version of ${app}...`);
-                    res = loadApp(suite, app);
+                    res = loadApp(suite, appSummary);
 
                     if (!res.success) {
                         this.log(`Could not load app ${app}, skipping...`);

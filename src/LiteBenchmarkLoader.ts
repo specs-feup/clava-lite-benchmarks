@@ -40,11 +40,7 @@ export function* loadSuite(suite: BenchmarkSuite): Generator<LoadResult> {
     }
 }
 
-export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary | string, cachedPath?: string): LoadResult {
-    if (typeof appSummary === "string") {
-        appSummary = suite.apps[appSummary];
-    }
-
+export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPath?: string): LoadResult {
     const fullPath = cachedPath != undefined ? cachedPath : (() => {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);

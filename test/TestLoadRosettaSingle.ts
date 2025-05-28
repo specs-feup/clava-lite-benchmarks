@@ -4,7 +4,7 @@ import { loadApp } from "../src/LiteBenchmarkLoader.js";
 import { ROSETTA } from "../src/BenchmarkSuites.js";
 
 let suite = ROSETTA;
-let app = "spam-filter"
+let app = ROSETTA.apps["spam-filter"];
 loadApp(suite, app);
 
 for (const fun of Query.search(FunctionJp)) {

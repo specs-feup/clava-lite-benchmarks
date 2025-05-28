@@ -4,7 +4,7 @@ import { loadApp } from "../src/LiteBenchmarkLoader.js";
 import { APPS } from "../src/BenchmarkSuites.js";
 
 let suite = APPS;
-let app = "edgedetect"
+let app = APPS.apps["edgedetect"];
 loadApp(suite, app);
 
 for (const fun of Query.search(FunctionJp)) {
