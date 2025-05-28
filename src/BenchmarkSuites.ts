@@ -76,19 +76,16 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
     name: "CortexSuite-Vision",
     path: "benchmarks/CortexSuite-Vision/",
     apps: {
-        "vision-disparity": { standard: "c11", topFunction: "getDisparity", canonicalName: "vision-disparity" },
-        "vision-edge": { standard: "c11", topFunction: "main", canonicalName: "vision-edge" },
-        "vision-fd": { standard: "c11", topFunction: "main", canonicalName: "vision-fd" },
-        "vision-hog": { standard: "c11", topFunction: "main", canonicalName: "vision-hog" },
-        "vision-localization": { standard: "c11", topFunction: "main", canonicalName: "vision-localization" },
-        "vision-mser": { standard: "c11", topFunction: "main", canonicalName: "vision-mser" },
-        "vision-multicut": { standard: "c11", topFunction: "main", canonicalName: "vision-multicut" },
-        "vision-pca": { standard: "c11", topFunction: "main", canonicalName: "vision-pca" },
-        "vision-sift": { standard: "c11", topFunction: "main", canonicalName: "vision-sift" },
-        "vision-stitch": { standard: "c11", topFunction: "main", canonicalName: "vision-stitch" },
-        "vision-svm": { standard: "c11", topFunction: "main", canonicalName: "vision-svm" },
-        "vision-texture-synthesis": { standard: "c11", topFunction: "create_texture", canonicalName: "vision-texture-synthesis" },
-        "vision-tracking": { standard: "c11", topFunction: "main", canonicalName: "vision-tracking" }
+        "vision-disparity": { standard: "c11", topFunction: "getDisparity", canonicalName: "disparity" },
+        "vision-localization": { standard: "c11", topFunction: "main", canonicalName: "localization" },
+        "vision-mser": { standard: "c11", topFunction: "main", canonicalName: "mser" },
+        "vision-multi-ncut": { standard: "c11", topFunction: "main", canonicalName: "multi-ncut" },
+        "vision-pca": { standard: "c11", topFunction: "main", canonicalName: "pca" },
+        "vision-sift": { standard: "c11", topFunction: "main", canonicalName: "sift" },
+        "vision-stitch": { standard: "c11", topFunction: "main", canonicalName: "stitch" },
+        "vision-svm": { standard: "c11", topFunction: "main", canonicalName: "svm" },
+        "vision-texture-synthesis": { standard: "c11", topFunction: "create_texture", canonicalName: "texture-synthesis" },
+        "vision-tracking": { standard: "c11", topFunction: "main", canonicalName: "tracking" }
     },
     flags: []
 };
