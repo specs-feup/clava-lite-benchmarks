@@ -58,12 +58,12 @@ void corcol(float **data, int n, int m, float **symmat)
         mean[j] /= (float)n;
     }
 
-    printf("\nMeans of column vectors:\n");
+    // printf("\nMeans of column vectors:\n");
     for (j = 1; j <= m; j++)
     {
-        printf("%7.1f", mean[j]);
+        // printf("%7.1f", mean[j]);
     }
-    printf("\n");
+    // printf("\n");
 
     /* Determine standard deviations of column vectors of data matrix. */
 
@@ -84,12 +84,12 @@ void corcol(float **data, int n, int m, float **symmat)
             stddev[j] = 1.0;
     }
 
-    printf("\nStandard deviations of columns:\n");
+    // printf("\nStandard deviations of columns:\n");
     for (j = 1; j <= m; j++)
     {
-        printf("%7.1f", stddev[j]);
+        // printf("%7.1f", stddev[j]);
     }
-    printf("\n");
+    // printf("\n");
 
     /* Center and reduce the column vectors. */
 
@@ -101,7 +101,7 @@ void corcol(float **data, int n, int m, float **symmat)
             x = sqrt((float)n);
             x *= stddev[j];
             data[i][j] /= x;
-            printf("value is %lf\n", data[i][j]);
+            // printf("value is %lf\n", data[i][j]);
         }
     }
 
@@ -115,13 +115,13 @@ void corcol(float **data, int n, int m, float **symmat)
             for (i = 1; i <= n; i++)
             {
                 symmat[j1][j2] += (data[i][j1] * data[i][j2]);
-                printf("multiplying values [%d][%d] * [%d][%d]\n", i, j1, i, j2);
-                printf("Multiplying %lf and %lf\n", data[i][j1], data[i][j2]);
+                // printf("multiplying values [%d][%d] * [%d][%d]\n", i, j1, i, j2);
+                // printf("Multiplying %lf and %lf\n", data[i][j1], data[i][j2]);
 
-                printf("Value at %d %d = %lf\n", j1, j2, symmat[j1][j2]);
+                // printf("Value at %d %d = %lf\n", j1, j2, symmat[j1][j2]);
             }
-            printf("**SPLIT**\n");
-            printf("swapping [%d] [%d] = [%d] [%d]\n", j2, j1, j1, j2);
+            // printf("**SPLIT**\n");
+            // printf("swapping [%d] [%d] = [%d] [%d]\n", j2, j1, j1, j2);
 
             symmat[j2][j1] = symmat[j1][j2];
         }
@@ -155,12 +155,12 @@ void covcol(float **data, int n, int m, float **symmat)
         mean[j] /= (float)n;
     }
 
-    printf("\nMeans of column vectors:\n");
+    // printf("\nMeans of column vectors:\n");
     for (j = 1; j <= m; j++)
     {
-        printf("%7.1f", mean[j]);
+        // printf("%7.1f", mean[j]);
     }
-    printf("\n");
+    // printf("\n");
 
     /* Center the column vectors. */
 
@@ -455,13 +455,13 @@ int main(int argc, char *argv[])
 
     if (argc != 5)
     {
-        printf("Syntax help: PCA filename #rows #cols option\n\n");
-        printf("(filename -- give full path name,\n");
-        printf(" #rows                          \n");
-        printf(" #cols    -- integer values,\n");
-        printf(" option   -- R (recommended) for correlation analysis,\n");
-        printf("             V for variance/covariance analysis\n");
-        printf("             S for SSCP analysis.)\n");
+        // printf("Syntax help: PCA filename #rows #cols option\n\n");
+        // printf("(filename -- give full path name,\n");
+        // printf(" #rows                          \n");
+        // printf(" #cols    -- integer values,\n");
+        // printf(" option   -- R (recommended) for correlation analysis,\n");
+        // printf("             V for variance/covariance analysis\n");
+        // printf("             S for SSCP analysis.)\n");
         exit(1);
     }
 
@@ -469,8 +469,8 @@ int main(int argc, char *argv[])
     m = atoi(argv[3]);            /* # columns */
     strncpy(&option, argv[4], 1); /* Analysis option */
 
-    printf("No. of rows: %d, no. of columns: %d.\n", n, m);
-    printf("Input file: %s.\n", argv[1]);
+    // printf("No. of rows: %d, no. of columns: %d.\n", n, m);
+    // printf("Input file: %s.\n", argv[1]);
 
     if ((stream = fopen(argv[1], "r")) == NULL)
     {
@@ -492,13 +492,13 @@ int main(int argc, char *argv[])
         {
             fscanf(stream, "%f", &in_value);
             data[i][j] = in_value;
-            printf("at row %d column %d is %lf\n", i, j, data[i][j]);
+            // printf("at row %d column %d is %lf\n", i, j, data[i][j]);
         }
     }
 
     /* Check on (part of) input data.
        for (i = 1; i <= 18; i++) {for (j = 1; j <= 8; j++)  {
-       printf("%7.1f", data[i][j]);  }  printf("\n");  }
+       //printf("%7.1f", data[i][j]);  }  //printf("\n");  }
        */
 
     symmat = matrix(m, m); /* Allocation of correlation (etc.) matrix */
