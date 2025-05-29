@@ -78,10 +78,22 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     for (const source of sources) {
         Clava.addExistingFile(source);
     }
-    Clava.rebuild();
+
+    let maxAttempts = 5;
+    let keepTrying = true;
+    do {
+        keepTrying = Clava.rebuild();
+
+        if (!keepTrying) {
+            log(`Error parsing AST for ${appSummary.canonicalName}, trying again...`);
+            maxAttempts--;
+        } else {
+            log(`AST for ${appSummary.canonicalName} parsed successfully`);
+        }
+    } while (!keepTrying && maxAttempts > 0);
 
     return {
-        success: true,
+        success: keepTrying,
         app: appSummary.canonicalName,
         topFunction: appSummary.topFunction
     };
