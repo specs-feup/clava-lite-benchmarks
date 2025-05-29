@@ -74,19 +74,19 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     const sources = readSourcesInFolder(fullPath);
     log(`Found ${sources.length} files for ${appSummary.canonicalName}`);
 
-    Clava.pushAst(ClavaJoinPoints.program());
-    for (const source of sources) {
-        Clava.addExistingFile(source);
-    }
-
     let maxAttempts = 5;
     let keepTrying = true;
     do {
+        Clava.pushAst(ClavaJoinPoints.program());
+        for (const source of sources) {
+            Clava.addExistingFile(source);
+        }
         keepTrying = Clava.rebuild();
 
         if (!keepTrying) {
             log(`Error parsing AST for ${appSummary.canonicalName}, trying again...`);
             maxAttempts--;
+            Clava.popAst();
         } else {
             log(`AST for ${appSummary.canonicalName} parsed successfully`);
         }
