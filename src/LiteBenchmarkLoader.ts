@@ -1,3 +1,4 @@
+import { Amalgamator } from "@specs-feup/clava-code-transforms/Amalgamator";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 import ClavaJoinPoints from "@specs-feup/clava/api/clava/ClavaJoinPoints.js";
 import Io from "@specs-feup/lara/api/lara/Io.js";
@@ -19,6 +20,7 @@ export type AppSummary = {
     topFunction: string,
     altTopFunction?: string
     inputs?: string,
+    amalgamate?: boolean
 }
 
 export type LoadResult = {
@@ -92,11 +94,33 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         }
     } while (!keepTrying && maxAttempts > 0);
 
+    transformApp(appSummary);
+
     return {
         success: keepTrying,
         app: appSummary.canonicalName,
         topFunction: appSummary.topFunction
     };
+}
+
+function transformApp(appSummary: AppSummary): void {
+    const topFunctionName = appSummary.topFunction;
+    ensureTopFunctionExists(topFunctionName);
+
+    if (appSummary.altTopFunction) {
+        const altTopFunctionName = appSummary.altTopFunction;
+        ensureTopFunctionExists(altTopFunctionName);
+    }
+
+    if (appSummary.amalgamate) {
+        const amalgamator = new Amalgamator();
+        const [amalgFile, includes] = amalgamator.amalgamate(topFunctionName);
+        amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+    }
+}
+
+function ensureTopFunctionExists(name: string): void {
+
 }
 
 function readSourcesInFolder(folderPath: string): string[] {

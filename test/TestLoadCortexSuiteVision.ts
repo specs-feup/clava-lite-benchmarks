@@ -1,11 +1,13 @@
 import { loadApp, loadSuite } from "../src/LiteBenchmarkLoader.js";
 import { CORTEXSUITE_VISION } from "../src/BenchmarkSuites.js";
 import { Amalgamator } from "@specs-feup/clava-code-transforms/Amalgamator";
+import { FileJp } from "@specs-feup/clava/api/Joinpoints.js";
+import Query from "@specs-feup/lara/api/weaver/Query.js";
 
 function handleApp(appName: string): void {
-    const merger = new Amalgamator();
-    const [file, includes] = merger.amalgamate(appName);
-    merger.writeAmalgamation(file, `outputs/${appName}`, includes);
+    for (const file of Query.search(FileJp)) {
+        console.log(`App: ${appName}, file: ${file.filename}`);
+    }
 }
 
 function loadOne(appName: string): void {
@@ -32,13 +34,5 @@ function loadAll(): void {
     }
 }
 
-//loadOne("vision-disparity");
-//loadOne("vision-localization");
-//loadOne("vision-mser");
-//loadOne("vision-multi-ncut");
-//loadOne("vision-pca");
-//loadOne("vision-sift");
-//loadOne("vision-stitch");
-//loadOne("vision-svm");
-//loadOne("vision-texture-synthesis");
-loadOne("vision-tracking");
+loadOne("vision-svm");
+//loadAll();

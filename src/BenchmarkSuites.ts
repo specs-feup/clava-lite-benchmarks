@@ -76,16 +76,16 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
     name: "CortexSuite-Vision",
     path: "benchmarks/CortexSuite-Vision/",
     apps: {
-        "vision-disparity": { standard: "c11", topFunction: "getDisparity", canonicalName: "disparity" },
-        "vision-localization": { standard: "c11", topFunction: "main", canonicalName: "localization" },
-        "vision-mser": { standard: "c11", topFunction: "main", canonicalName: "mser" },
-        "vision-multi-ncut": { standard: "c11", topFunction: "main", canonicalName: "multi-ncut" },
-        "vision-pca": { standard: "c11", topFunction: "main", canonicalName: "pca" },
-        "vision-sift": { standard: "c11", topFunction: "main", canonicalName: "sift" },
-        "vision-stitch": { standard: "c11", topFunction: "main", canonicalName: "stitch" },
-        "vision-svm": { standard: "c11", topFunction: "main", canonicalName: "svm" },
-        "vision-texture-synthesis": { standard: "c11", topFunction: "create_texture", canonicalName: "texture-synthesis" },
-        "vision-tracking": { standard: "c11", topFunction: "main", canonicalName: "tracking" }
+        "vision-disparity": { standard: "c11", topFunction: "getDisparity", canonicalName: "disparity", amalgamate: true },
+        "vision-localization": { standard: "c11", topFunction: "main", canonicalName: "localization", amalgamate: true },
+        "vision-mser": { standard: "c11", topFunction: "main", canonicalName: "mser", amalgamate: true },
+        "vision-multi-ncut": { standard: "c11", topFunction: "main", canonicalName: "multi-ncut", amalgamate: true },
+        "vision-pca": { standard: "c11", topFunction: "main", canonicalName: "pca", amalgamate: true },
+        "vision-sift": { standard: "c11", topFunction: "main", canonicalName: "sift", amalgamate: true },
+        "vision-stitch": { standard: "c11", topFunction: "main", canonicalName: "stitch", amalgamate: true },
+        "vision-svm": { standard: "c11", topFunction: "svm", canonicalName: "svm", amalgamate: true },
+        "vision-texture-synthesis": { standard: "c11", topFunction: "create_texture", canonicalName: "texture-synthesis", amalgamate: true },
+        "vision-tracking": { standard: "c11", topFunction: "main", canonicalName: "tracking", amalgamate: true }
     },
     flags: []
 };
