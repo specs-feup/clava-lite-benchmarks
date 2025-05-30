@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
     /** Start timing **/
     start = photonStartTiming();
-
+#pragma clava begin_outline svm
     alpha = getAlphaFromTrainSet(N, trn1, trn2, iter);
     a_result = alpha->a_result;
     b_result = alpha->b_result;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
         fFreeHandle(s);
         asubsref(result, n) = maxs;
     }
-
+#pragma clava end_outline svm
     /** Timing utils */
     stop = photonEndTiming();
 

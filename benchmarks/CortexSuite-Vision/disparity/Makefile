@@ -18,7 +18,7 @@ $(ELF):
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC)
 
 run: $(ELF)
-	@/usr/bin/time -f "Time:\n  real: %e sec\n  user: %U sec\n  sys:  %S sec" ./$(ELF) data/$(INPUT)
+	@/usr/bin/time -f "Time:\n  real: %e sec\n  user: %U sec\n  sys:  %S sec" ./$(ELF) data/$(INPUT) 
 
 clean:
 	rm -f $(ELF)
