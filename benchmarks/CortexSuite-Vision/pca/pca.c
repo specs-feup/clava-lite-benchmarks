@@ -504,7 +504,7 @@ int main(int argc, char *argv[])
     symmat = matrix(m, m); /* Allocation of correlation (etc.) matrix */
 
     /* Look at analysis option; branch in accordance with this. */
-
+#pragma clava begin_outline pca
     switch (option)
     {
     case 'R':
@@ -668,7 +668,7 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
-
+#pragma clava end_outline pca
     free_matrix(data, n, m);
     free_matrix(symmat, m, m);
     free_matrix(symmat2, m, m);

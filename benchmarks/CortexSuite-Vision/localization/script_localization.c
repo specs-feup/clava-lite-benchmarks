@@ -91,8 +91,9 @@ int main(int argc, char *argv[])
     }
 
     /** Start Timing **/
-    start = photonStartTiming();
 
+    start = photonStartTiming();
+#pragma clava begin_outline initQuartenion
     {
         F2D *eulAngle, *randn;
         eulAngle = fSetArray(n, 3, 0);
@@ -122,7 +123,7 @@ int main(int argc, char *argv[])
     index = iSetArray(1, 1, -1);
     sType = iSetArray(1, 1, -1);
     isEOF = iSetArray(1, 1, -1);
-
+#pragma clava end_outline initQuartenion
     /** Timing utils **/
     endC = photonEndTiming();
     elapsed = photonReportTiming(start, endC);
@@ -150,7 +151,7 @@ int main(int argc, char *argv[])
 
         /** Start Timing **/
         start = photonStartTiming();
-
+#pragma clava begin_outline updateState
         if (asubsref(sType, 0) == 2)
         {
 
@@ -462,6 +463,7 @@ int main(int argc, char *argv[])
             }
         }
 
+#pragma clava end_outline updateState
         /** Timing utils **/
         endC = photonEndTiming();
         elt = photonReportTiming(start, endC);

@@ -76,16 +76,68 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
     name: "CortexSuite-Vision",
     path: "benchmarks/CortexSuite-Vision/",
     apps: {
-        "vision-disparity": { standard: "c11", topFunction: "getDisparity", canonicalName: "disparity", amalgamate: true },
-        "vision-localization": { standard: "c11", topFunction: "main", canonicalName: "localization", amalgamate: true },
-        "vision-mser": { standard: "c11", topFunction: "main", canonicalName: "mser", amalgamate: true },
-        "vision-multi-ncut": { standard: "c11", topFunction: "main", canonicalName: "multi-ncut", amalgamate: true },
-        "vision-pca": { standard: "c11", topFunction: "main", canonicalName: "pca", amalgamate: true },
-        "vision-sift": { standard: "c11", topFunction: "main", canonicalName: "sift", amalgamate: true },
-        "vision-stitch": { standard: "c11", topFunction: "main", canonicalName: "stitch", amalgamate: true },
-        "vision-svm": { standard: "c11", topFunction: "svm", canonicalName: "svm", amalgamate: true },
-        "vision-texture-synthesis": { standard: "c11", topFunction: "create_texture", canonicalName: "texture-synthesis", amalgamate: true },
-        "vision-tracking": { standard: "c11", topFunction: "main", canonicalName: "tracking", amalgamate: true }
+        "vision-disparity": {
+            standard: "c11",
+            topFunction: "getDisparity",
+            canonicalName: "disparity",
+            amalgamate: true
+        },
+        "vision-localization": {
+            standard: "c11",
+            topFunction: "updateState",
+            altTopFunction: "initQuartenion",
+            canonicalName: "localization",
+            amalgamate: true
+        },
+        "vision-mser": {
+            standard: "c11",
+            topFunction: "mser",
+            canonicalName: "mser",
+            amalgamate: true
+        },
+        "vision-multi-ncut": {
+            standard: "c11",
+            topFunction: "segment_image",
+            canonicalName: "multi-ncut",
+            amalgamate: true
+        },
+        "vision-pca": {
+            standard: "c11",
+            topFunction: "pca",
+            canonicalName: "pca",
+            amalgamate: true
+        },
+        "vision-sift": {
+            standard: "c11",
+            topFunction: "normalizeAndSIFT",
+            canonicalName: "sift",
+            amalgamate: true
+        },
+        "vision-stitch": {
+            standard: "c11",
+            topFunction: "stitch",
+            canonicalName: "stitch",
+            amalgamate: true
+        },
+        "vision-svm": {
+            standard: "c11",
+            topFunction: "svm",
+            canonicalName: "svm",
+            amalgamate: true
+        },
+        "vision-texture-synthesis": {
+            standard: "c11",
+            topFunction: "create_texture",
+            canonicalName: "texture-synthesis",
+            amalgamate: true
+        },
+        "vision-tracking": {
+            standard: "c11",
+            topFunction: "trackFeaturesPyramidalLK",
+            altTopFunction: "imagePreprocessing",
+            canonicalName: "tracking",
+            amalgamate: true
+        }
     },
     flags: []
 };

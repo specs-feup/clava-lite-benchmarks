@@ -55,10 +55,12 @@ int main(int argc, char *argv[])
     cols = image->width;
 
     startTime = photonStartTiming();
+#pragma clava begin_outline normalizeAndSIFT
     /** Normalize the input image to lie between 0-1 **/
     normalizeImage(image);
     /** Extract sift features for the normalized image **/
     frames = sift(image);
+#pragma clava end_outline normalizeAndSIFT
     endTime = photonEndTiming();
 
     printf("Input size\t\t- (%dx%d)\n", rows, cols);

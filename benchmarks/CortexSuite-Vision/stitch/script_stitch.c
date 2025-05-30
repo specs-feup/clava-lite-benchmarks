@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
     printf("Input size\t\t- (%dx%d)\n", rows, cols);
     start = photonStartTiming();
-
+#pragma clava begin_outline stitch
     v = harris(Icur);
     interestPnts = getANMS(v, 24);
 
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     }
 
     Fcur = extractFeatures(Icur, int1, int2);
-
+#pragma clava end_outline stitch
     endC = photonEndTiming();
     elapsed = photonReportTiming(start, endC);
 

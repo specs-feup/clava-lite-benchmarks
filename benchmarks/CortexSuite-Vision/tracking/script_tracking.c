@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     /** Start Timing **/
     start = photonStartTiming();
-
+#pragma clava begin_outline imagePreprocessing
     /** IMAGE PRE-PROCESSING **/
 
     /** Blur the image to remove noise - weighted avergae filter **/
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
             subsref(features, i, j) = subsref(interestPnt, j, i);
         }
     }
-
+#pragma clava end_outline imagePreprocessing
     end = photonEndTiming();
     elapsed = photonReportTiming(start, end);
 
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
         /* Start timing */
         start = photonStartTiming();
-
+#pragma clava begin_outline trackFeaturesPyramidalLK
         /** Blur image to remove noise **/
         blurredImage = imageBlur(Ic);
         previousFrameBlurred_level1 = fDeepCopy(blurred_level1);
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
         /** Populate newpoints into features **/
         features = fDeepCopy(newpoints);
         fFreeHandle(newpoints);
-
+#pragma clava end_outline trackFeaturesPyramidalLK
         /* Timing utils */
         end = photonEndTiming();
         elt = photonReportTiming(start, end);
