@@ -1,7 +1,10 @@
 import { Amalgamator } from "@specs-feup/clava-code-transforms/Amalgamator";
+import { Outliner } from "@specs-feup/clava-code-transforms/Outliner";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 import ClavaJoinPoints from "@specs-feup/clava/api/clava/ClavaJoinPoints.js";
+import { FunctionJp, WrapperStmt } from "@specs-feup/clava/api/Joinpoints.js";
 import Io from "@specs-feup/lara/api/lara/Io.js";
+import Query from "@specs-feup/lara/api/weaver/Query.js";
 import chalk from "chalk";
 import { readdirSync } from "fs";
 import path from "path";
@@ -108,8 +111,7 @@ function transformApp(appSummary: AppSummary): void {
     ensureTopFunctionExists(topFunctionName);
 
     if (appSummary.altTopFunction) {
-        const altTopFunctionName = appSummary.altTopFunction;
-        ensureTopFunctionExists(altTopFunctionName);
+        ensureTopFunctionExists(appSummary.altTopFunction);
     }
 
     if (appSummary.amalgamate) {
@@ -120,7 +122,39 @@ function transformApp(appSummary: AppSummary): void {
 }
 
 function ensureTopFunctionExists(name: string): void {
+    const exists = Query.search(FunctionJp, { name: name }).get().length > 0;
 
+    if (!exists) {
+        log(`Top function ${name} not found in the AST, trying to find outlining directives`);
+
+        const pragmaBegin = `#pragma clava begin_outline ${name}`;
+        const pragmaEnd = `#pragma clava end_outline ${name}`;
+
+        let begin: WrapperStmt | undefined;
+        let end: WrapperStmt | undefined;
+
+        for (const stmt of Query.search(WrapperStmt)) {
+            if (stmt.code.trim() === pragmaBegin) {
+                log(`Found outlining begin directive for ${name}`);
+                begin = stmt;
+            }
+            if (stmt.code.trim() === pragmaEnd) {
+                log(`Found outlining end directive for ${name}`);
+                end = stmt;
+            }
+        }
+
+        if (begin && end) {
+            const outliner = new Outliner();
+            outliner.setDefaultPrefix("");
+            outliner.outlineWithName(begin, end, name);
+        } else {
+            log(`No outlining directives found for ${name}, cannot create function.`);
+        }
+
+    } else {
+        log(`Top function ${name} exists in the AST.`);
+    }
 }
 
 function readSourcesInFolder(folderPath: string): string[] {
