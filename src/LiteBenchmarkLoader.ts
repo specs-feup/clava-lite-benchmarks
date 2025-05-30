@@ -106,7 +106,14 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     };
 }
 
-function transformApp(appSummary: AppSummary): void {
+function transformApp(appSummary: AppSummary): boolean {
+    if (appSummary.amalgamate) {
+        const amalgamator = new Amalgamator();
+        const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
+        amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+        log(`Amalgamated files for ${appSummary.canonicalName}`);
+    }
+
     const topFunctionName = appSummary.topFunction;
     ensureTopFunctionExists(topFunctionName);
 
@@ -114,10 +121,14 @@ function transformApp(appSummary: AppSummary): void {
         ensureTopFunctionExists(appSummary.altTopFunction);
     }
 
-    if (appSummary.amalgamate) {
-        const amalgamator = new Amalgamator();
-        const [amalgFile, includes] = amalgamator.amalgamate(topFunctionName);
-        amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+    log("Rebuilding AST after transformations...");
+    try {
+        //Clava.rebuild();
+        log(`AST for ${appSummary.canonicalName} transformed successfully`);
+        return true;
+    } catch (error) {
+        log(`Error transforming AST for ${appSummary.canonicalName}`);
+        return false;
     }
 }
 
