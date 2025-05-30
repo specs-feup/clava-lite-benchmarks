@@ -146,8 +146,12 @@ function ensureTopFunctionExists(name: string): void {
 
         if (begin && end) {
             const outliner = new Outliner();
+
             outliner.setDefaultPrefix("");
             outliner.outlineWithName(begin, end, name);
+
+            begin.detach();
+            end.detach();
         } else {
             log(`No outlining directives found for ${name}, cannot create function.`);
         }
