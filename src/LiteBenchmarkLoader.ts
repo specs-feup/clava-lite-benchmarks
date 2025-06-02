@@ -29,7 +29,8 @@ export type AppSummary = {
 export type LoadResult = {
     success: boolean,
     app: string,
-    topFunction: string
+    topFunction: string,
+    altTopFunction?: string
 }
 
 export function appList(suite: BenchmarkSuite): string[] {
@@ -99,11 +100,15 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
 
     transformApp(appSummary);
 
-    return {
+    const res: LoadResult = {
         success: keepTrying,
         app: appSummary.canonicalName,
-        topFunction: appSummary.topFunction
+        topFunction: appSummary.topFunction,
     };
+    if (appSummary.altTopFunction) {
+        res.altTopFunction = appSummary.altTopFunction;
+    }
+    return res;
 }
 
 function transformApp(appSummary: AppSummary): boolean {
