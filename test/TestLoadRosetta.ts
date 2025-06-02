@@ -3,9 +3,7 @@ import Query from "@specs-feup/lara/api/weaver/Query.js";
 import { ROSETTA } from "../src/BenchmarkSuites.js";
 import { loadSuite } from "../src/LiteBenchmarkLoader.js";
 
-const loader = loadSuite(ROSETTA);
-
-for (const res of loader) {
+for (const res of loadSuite(ROSETTA)) {
     if (res.success) {
         console.log(`Loaded app: ${res.app}, top function: ${res.topFunction}`);
 
