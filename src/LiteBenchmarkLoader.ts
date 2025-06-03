@@ -181,11 +181,20 @@ function readSourcesInFolder(folderPath: string): string[] {
     const sources: string[] = [];
 
     try {
-        const files = readdirSync(folderPath);
+        const files = readdirSync(folderPath, { withFileTypes: true });
+        const nonCodeFiles: string[] = [];
+        const subdirectories: string[] = [];
+
         for (const file of files) {
-            if (typeof file === "string") {
-                if ([".c", ".cpp", ".h", ".hpp"].some(char => file.endsWith(char))) {
-                    sources.push(`${folderPath}/${file}`);
+            if (file.isDirectory()) {
+                subdirectories.push(`${folderPath}/${file.name}`);
+            }
+            else if (file.isFile()) {
+                if ([".c", ".cpp", ".h", ".hpp"].some(ext => file.name.endsWith(ext))) {
+                    sources.push(`${folderPath}/${file.name}`);
+                }
+                else {
+                    nonCodeFiles.push(`${folderPath}/${file.name}`);
                 }
             }
         }
