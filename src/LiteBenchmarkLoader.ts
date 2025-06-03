@@ -77,8 +77,16 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         };
     }
 
-    const sources = readSourcesInFolder(fullPath);
+    const [sources, nonSources, subdirectories] = readSourcesInFolder(fullPath);
     log(`Found ${sources.length} files for ${appSummary.canonicalName}`);
+
+    if (nonSources.length > 0) {
+        log(`Found ${nonSources.length} non-source files for ${appSummary.canonicalName}`);
+    }
+
+    if (subdirectories.length > 0) {
+        log(`Found ${subdirectories.length} subdirectories for ${appSummary.canonicalName}`);
+    }
 
     let maxAttempts = 5;
     let keepTrying = true;
@@ -177,13 +185,13 @@ function ensureTopFunctionExists(name: string): void {
     }
 }
 
-function readSourcesInFolder(folderPath: string): string[] {
+function readSourcesInFolder(folderPath: string): [string[], string[], string[]] {
     const sources: string[] = [];
+    const nonSources: string[] = [];
+    const subdirectories: string[] = [];
 
     try {
         const files = readdirSync(folderPath, { withFileTypes: true });
-        const nonCodeFiles: string[] = [];
-        const subdirectories: string[] = [];
 
         for (const file of files) {
             if (file.isDirectory()) {
@@ -194,14 +202,14 @@ function readSourcesInFolder(folderPath: string): string[] {
                     sources.push(`${folderPath}/${file.name}`);
                 }
                 else {
-                    nonCodeFiles.push(`${folderPath}/${file.name}`);
+                    nonSources.push(`${folderPath}/${file.name}`);
                 }
             }
         }
     } catch (err) {
         log(`Error reading files: ${err}`);
     }
-    return sources;
+    return [sources, nonSources, subdirectories];
 }
 
 function log(message: string): void {
