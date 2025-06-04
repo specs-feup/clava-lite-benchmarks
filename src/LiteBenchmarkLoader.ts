@@ -6,8 +6,8 @@ import { FunctionJp, WrapperStmt } from "@specs-feup/clava/api/Joinpoints.js";
 import Io from "@specs-feup/lara/api/lara/Io.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
 import chalk from "chalk";
-import { readdirSync } from "fs";
-import path from "path";
+import { copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync } from "fs";
+import path, { basename, join } from "path";
 import { fileURLToPath } from "url";
 
 export type BenchmarkSuite = {
@@ -31,6 +31,7 @@ export type LoadResult = {
     app: string,
     topFunction: string,
     altTopFunction?: string
+    direntsToCopy?: string[]
 }
 
 export function appList(suite: BenchmarkSuite): string[] {
@@ -116,7 +117,42 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     if (appSummary.altTopFunction) {
         res.altTopFunction = appSummary.altTopFunction;
     }
+    if (nonSources.length > 0 || subdirectories.length > 0) {
+        res.direntsToCopy = [...nonSources, ...subdirectories];
+    }
     return res;
+}
+
+function copyRecursive(src: string, dest: string): void {
+    const stat = lstatSync(src);
+
+    if (stat.isDirectory()) {
+        if (!existsSync(dest)) {
+            mkdirSync(dest, { recursive: true });
+        }
+
+        const entries = readdirSync(src);
+        for (const entry of entries) {
+            const srcPath = join(src, entry);
+            const destPath = join(dest, entry);
+            copyRecursive(srcPath, destPath);
+        }
+    } else if (stat.isFile()) {
+        copyFileSync(src, dest);
+    } else {
+        console.warn(`Skipping unsupported file type: ${src}`);
+    }
+}
+
+export function copyDirents(dirents: string[], targetPath: string): void {
+    if (!existsSync(targetPath)) {
+        mkdirSync(targetPath, { recursive: true });
+    }
+
+    for (const dirent of dirents) {
+        const destPath = join(targetPath, basename(dirent));
+        copyRecursive(dirent, destPath);
+    }
 }
 
 function transformApp(appSummary: AppSummary): boolean {
