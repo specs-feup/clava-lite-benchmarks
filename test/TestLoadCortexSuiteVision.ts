@@ -9,8 +9,8 @@ function handleApp(appName: string, direntsToCopy: string[]): void {
     for (const file of Query.search(FileJp)) {
         console.log(`App: ${appName}, file: ${file.filename}`);
     }
-    Clava.writeCode(`outputs/${appName}`);
-    copyDirents(direntsToCopy, `outputs/${appName}`);
+    Clava.writeCode(`outputs/CortexSuite-Vision/${appName}`);
+    copyDirents(direntsToCopy, `outputs/CortexSuite-Vision/${appName}`);
 }
 
 function loadOne(appName: string): void {

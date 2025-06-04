@@ -203,11 +203,37 @@ export const ROSETTA: BenchmarkSuite = {
     name: "Rosetta",
     path: "benchmarks/Rosetta/",
     apps: {
-        "3d-rendering": { standard: "c++11", topFunction: "rendering_sw", canonicalName: "3d-rendering" },
-        "digit-recognition": { standard: "c++11", topFunction: "DigitRec_sw", canonicalName: "digit-recognition" },
-        "face-detection": { standard: "c++11", topFunction: "face_detect_sw", canonicalName: "face-detection" },
-        "optical-flow": { standard: "c++11", topFunction: "optical_flow_sw", canonicalName: "optical-flow" },
-        "spam-filter": { standard: "c++11", topFunction: "SgdLR_sw", canonicalName: "spam-filter", altTopFunction: "main" }
+        "3d-rendering": {
+            standard: "c++11",
+            topFunction: "rendering_sw",
+            canonicalName: "3d-rendering",
+            amalgamate: true
+        },
+        "digit-recognition": {
+            standard: "c++11",
+            topFunction: "DigitRec_sw",
+            canonicalName: "digit-recognition",
+            amalgamate: true
+        },
+        "face-detection": {
+            standard: "c++11",
+            topFunction: "face_detect_sw",
+            canonicalName: "face-detection",
+            amalgamate: true
+        },
+        "optical-flow": {
+            standard: "c++11",
+            topFunction: "optical_flow_sw",
+            canonicalName: "optical-flow",
+            amalgamate: true
+        },
+        "spam-filter": {
+            standard: "c++11",
+            topFunction: "SgdLR_sw",
+            canonicalName: "spam-filter",
+            altTopFunction: "main",
+            amalgamate: true
+        }
     },
     flags: ["-D SW"]
 };
