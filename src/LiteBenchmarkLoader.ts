@@ -31,7 +31,7 @@ export type LoadResult = {
     app: string,
     topFunction: string,
     altTopFunction?: string
-    direntsToCopy?: string[]
+    direntsToCopy: string[]
 }
 
 export function appList(suite: BenchmarkSuite): string[] {
@@ -74,7 +74,8 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         return {
             success: false,
             app: appSummary.canonicalName,
-            topFunction: "<none>"
+            topFunction: "<none>",
+            direntsToCopy: [],
         };
     }
 
@@ -113,12 +114,10 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         success: keepTrying,
         app: appSummary.canonicalName,
         topFunction: appSummary.topFunction,
+        direntsToCopy: [...nonSources, ...subdirectories]
     };
     if (appSummary.altTopFunction) {
         res.altTopFunction = appSummary.altTopFunction;
-    }
-    if (nonSources.length > 0 || subdirectories.length > 0) {
-        res.direntsToCopy = [...nonSources, ...subdirectories];
     }
     return res;
 }
@@ -156,11 +155,16 @@ export function copyDirents(dirents: string[], targetPath: string): void {
 }
 
 function transformApp(appSummary: AppSummary): boolean {
-    if (appSummary.amalgamate) {
-        const amalgamator = new Amalgamator();
-        const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
-        amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
-        log(`Amalgamated files for ${appSummary.canonicalName}`);
+    try {
+        if (appSummary.amalgamate) {
+            const amalgamator = new Amalgamator();
+            const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
+            amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+            log(`Amalgamated files for ${appSummary.canonicalName}`);
+        }
+    } catch (error) {
+        log(`Error amalgamating files for ${appSummary.canonicalName}: ${error}`);
+        return false;
     }
 
     const topFunctionName = appSummary.topFunction;
@@ -185,7 +189,7 @@ function ensureTopFunctionExists(name: string): void {
     const exists = Query.search(FunctionJp, { name: name }).get().length > 0;
 
     if (!exists) {
-        log(`Top function ${name} not found in the AST, trying to find outlining directives`);
+        log(`Top function ${name} not found, checking for outlining directives...`);
 
         const pragmaBegin = `#pragma clava begin_outline ${name}`;
         const pragmaEnd = `#pragma clava end_outline ${name}`;
@@ -249,5 +253,5 @@ function readSourcesInFolder(folderPath: string): [string[], string[], string[]]
 }
 
 function log(message: string): void {
-    console.log(`[${chalk.yellowBright("BenchmarkLoader")}] ---------------------- ${message}`);
+    console.log(`[${chalk.yellowBright("BenchmarkLoader")}] ${message}`);
 }
