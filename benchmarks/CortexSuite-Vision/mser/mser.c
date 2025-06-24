@@ -250,7 +250,7 @@ I2D *mser(I2D *I, int in_delta)
                3 - the nieghbor is already in the tree, meaning that
                    is a pixel older than xi.
             */
-            if (good && nindex != index && forest_pt[nindex].parent != node_is_void)
+            if ((good && nindex != index && forest_pt[nindex].parent != node_is_void))
             {
                 idx_t nrindex = 0, nvisited;
                 val_t nrvalue = 0;
@@ -368,15 +368,23 @@ I2D *mser(I2D *I, int in_delta)
             /* move to next neighbor */
             k = 0;
             sref(nsubs_pt, k) = sref(nsubs_pt, k) + 1;
+
+            int exitWhile = 0;
             while (sref(nsubs_pt, k) > 1)
             {
                 sref(nsubs_pt, k++) = -1;
                 if (k == ndims)
-                    goto done_all_neighbors;
+                {
+                    exitWhile = 1;
+                    break;
+                }
                 sref(nsubs_pt, k) = sref(nsubs_pt, k) + 1;
             }
+            if (exitWhile)
+            {
+                break;
+            }
         } /* next neighbor */
-    done_all_neighbors:;
     } /* next pixel */
 
     /* the root of the last processed pixel must be a region */
@@ -545,19 +553,25 @@ I2D *mser(I2D *I, int in_delta)
             if (bad_cleanup && regions_pt[i].variation >= 1.0f)
             {
                 ++nbad;
-                goto remove_this_region;
+                regions_pt[i].maxstable = 0;
+                --nmer;
+                continue;
             }
 
             if (big_cleanup && regions_pt[i].area > nel / 2)
             {
                 ++nbig;
-                goto remove_this_region;
+                regions_pt[i].maxstable = 0;
+                --nmer;
+                continue;
             }
 
             if (small_cleanup && regions_pt[i].area < 25)
             {
                 ++nsmall;
-                goto remove_this_region;
+                regions_pt[i].maxstable = 0;
+                --nmer;
+                continue;
             }
 
             /** Remove duplicates */
@@ -591,17 +605,13 @@ I2D *mser(I2D *I, int in_delta)
                     if (change < 0.5)
                     {
                         ++ndup;
-                        goto remove_this_region;
+                        regions_pt[i].maxstable = 0;
+                        --nmer;
+                        continue;
                     }
 
                 } /* drop duplicates */
             }
-
-            continue;
-        remove_this_region:
-            regions_pt[i].maxstable = 0;
-            --nmer;
-
         } /* next region to cleanup */
 
         if (0)
