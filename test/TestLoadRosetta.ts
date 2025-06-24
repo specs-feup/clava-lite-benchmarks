@@ -4,6 +4,7 @@ import { ROSETTA } from "../src/BenchmarkSuites.js";
 import { copyDirents, loadSuite } from "../src/LiteBenchmarkLoader.js";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 
+
 for (const res of loadSuite(ROSETTA)) {
     if (res.success) {
         console.log(`Loaded app: ${res.app}, top function: ${res.topFunction}`);
