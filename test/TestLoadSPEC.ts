@@ -1,7 +1,7 @@
 import { FileJp } from "@specs-feup/clava/api/Joinpoints.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
 import { SPEC2017 } from "../src/BenchmarkSuites.js";
-import { copyDirents, loadApp, loadSuite } from "../src/LiteBenchmarkLoader.js";
+import { copyDirentsAbsolute, loadApp, loadSuite } from "../src/LiteBenchmarkLoader.js";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 
 function handleApp(appName: string, direntsToCopy: string[]): void {
@@ -14,7 +14,7 @@ function handleApp(appName: string, direntsToCopy: string[]): void {
     Clava.writeCode(`outputs/SPEC2017/${appName}`);
 
     // Copy any additional files (e.g., input files)
-    copyDirents(direntsToCopy, `outputs/SPEC2017/${appName}`);
+    copyDirentsAbsolute(direntsToCopy, `outputs/SPEC2017/${appName}`);
 }
 
 function loadOne(appName: string): void {
@@ -23,19 +23,20 @@ function loadOne(appName: string): void {
     console.log(`Loading app: ${appName}`);
 
     const res = loadApp(suite, app);
-    handleApp(app.canonicalName, res.direntsToCopy ? res.direntsToCopy : []);
+    handleApp(app.canonicalName, res.absoluteDirents ? res.absoluteDirents : []);
 }
 
 function loadAll(): void {
     const loader = loadSuite(SPEC2017);
 
     for (const res of loader) {
+        const name = res.appSummary.canonicalName;
         if (res.success) {
-            console.log(`Loaded app: ${res.app}, top function: ${res.topFunction}`);
-            handleApp(res.app, res.direntsToCopy ? res.direntsToCopy : []);
+            console.log(`Loaded app: ${name}, top function: ${res.appSummary.topFunction}`);
+            handleApp(name, res.absoluteDirents ? res.absoluteDirents : []);
         }
         else {
-            console.log(`Failed to load app: ${res.app}`);
+            console.log(`Failed to load app: ${name}`);
         }
     }
 }

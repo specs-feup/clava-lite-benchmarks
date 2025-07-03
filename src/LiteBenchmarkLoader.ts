@@ -29,10 +29,10 @@ export type AppSummary = {
 
 export type LoadResult = {
     success: boolean,
-    app: string,
-    topFunction: string,
-    altTopFunction?: string
-    direntsToCopy: string[]
+    appSummary: AppSummary,
+    absoluteDirents?: string[],
+    relativeDirents?: string[],
+    appRoot?: string
 }
 
 export function appList(suite: BenchmarkSuite): string[] {
@@ -80,21 +80,45 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         }
         return {
             success: false,
-            app: appSummary.canonicalName,
-            topFunction: "<none>",
-            direntsToCopy: [],
+            appSummary: appSummary
         };
     }
 
-    const [sources, nonSources, subdirectories] = readSourcesInFolder(fullPath);
+    const [sources, absoluteNonSources, absoluteSubdirs] = readSourcesInFolder(fullPath);
     log(`Found ${sources.length} files for ${appSummary.canonicalName}`);
 
-    if (nonSources.length > 0) {
-        log(`Found ${nonSources.length} non-source files for ${appSummary.canonicalName}`);
+    if (absoluteNonSources.length > 0) {
+        log(`Found ${absoluteNonSources.length} non-source files for ${appSummary.canonicalName}`);
     }
 
-    if (subdirectories.length > 0) {
-        log(`Found ${subdirectories.length} subdirectories for ${appSummary.canonicalName}`);
+    if (absoluteSubdirs.length > 0) {
+        log(`Found ${absoluteSubdirs.length} subdirectories for ${appSummary.canonicalName}`);
+    }
+
+    const relativeNonSources: string[] = [];
+    const relativeSubdirs: string[] = [];
+
+    if (appSummary.extraFiles) {
+        for (const extraFile of appSummary.extraFiles) {
+            const extraPath = join(fullPath, extraFile);
+            if (existsSync(extraPath)) {
+                const stat = lstatSync(extraPath);
+
+                if (stat.isDirectory()) {
+                    relativeSubdirs.push(extraFile);
+                    log(`Adding extra relative directory: ${extraFile}`);
+                }
+                else if (stat.isFile()) {
+                    relativeNonSources.push(extraFile);
+                    log(`Adding extra relative file: ${extraFile}`);
+                }
+                else {
+                    log(`Skipping unsupported file type: ${extraFile}`);
+                }
+            } else {
+                log(`Extra file not found: ${extraFile}`);
+            }
+        }
     }
 
     let maxAttempts = 5;
@@ -119,13 +143,11 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
 
     const res: LoadResult = {
         success: keepTrying,
-        app: appSummary.canonicalName,
-        topFunction: appSummary.topFunction,
-        direntsToCopy: [...nonSources, ...subdirectories]
+        appSummary: appSummary,
+        absoluteDirents: [...absoluteNonSources, ...absoluteSubdirs],
+        relativeDirents: [...relativeNonSources, ...relativeSubdirs],
+        appRoot: fullPath
     };
-    if (appSummary.altTopFunction) {
-        res.altTopFunction = appSummary.altTopFunction;
-    }
     return res;
 }
 
@@ -150,7 +172,7 @@ function copyRecursive(src: string, dest: string): void {
     }
 }
 
-export function copyDirents(dirents: string[], targetPath: string): void {
+export function copyDirentsAbsolute(dirents: string[], targetPath: string): void {
     if (!existsSync(targetPath)) {
         mkdirSync(targetPath, { recursive: true });
     }
@@ -158,6 +180,24 @@ export function copyDirents(dirents: string[], targetPath: string): void {
     for (const dirent of dirents) {
         const destPath = join(targetPath, basename(dirent));
         copyRecursive(dirent, destPath);
+    }
+}
+
+export function copyDirentsRelative(dirents: string[], originalPath: string, targetPath: string): void {
+    if (!existsSync(targetPath)) {
+        mkdirSync(targetPath, { recursive: true });
+    }
+
+    for (const dirent of dirents) {
+        const fullPath = path.join(originalPath, dirent);
+        if (existsSync(fullPath)) {
+            const destPath = join(targetPath, dirent);
+            copyRecursive(fullPath, destPath);
+            log(`Copied ${dirent} to ${destPath}`);
+        }
+        else {
+            log(`File not found for copying: ${fullPath}`);
+        }
     }
 }
 
@@ -243,13 +283,16 @@ function readSourcesInFolder(folderPath: string): [string[], string[], string[]]
         for (const file of files) {
             if (file.isDirectory()) {
                 subdirectories.push(`${folderPath}/${file.name}`);
+                log(`Adding subdirectory: ${file.name}`);
             }
             else if (file.isFile()) {
                 if ([".c", ".cpp", ".h", ".hpp"].some(ext => file.name.endsWith(ext))) {
                     sources.push(`${folderPath}/${file.name}`);
+                    log(`Adding source file: ${file.name}`);
                 }
                 else {
                     nonSources.push(`${folderPath}/${file.name}`);
+                    log(`Adding non-source file: ${file.name}`);
                 }
             }
         }

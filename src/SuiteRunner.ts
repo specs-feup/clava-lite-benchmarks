@@ -32,7 +32,7 @@ export abstract class SuiteRunner {
                     continue;
                 }
                 invalidCache = true;
-                this.log(`Loaded original version of app ${app} with top function ${res.topFunction}`);
+                this.log(`Loaded original version of app ${app} with top function ${res.appSummary.topFunction}`);
             }
             else {
                 this.log(`Trying to load cached version app ${app} from ${cachedPath}...`);
@@ -49,15 +49,15 @@ export abstract class SuiteRunner {
                         this.log(`Could not load app ${app}, skipping...`);
                         return false;
                     }
-                    this.log(`Loaded original version of app ${app} with top function ${res.topFunction}`);
+                    this.log(`Loaded original version of app ${app} with top function ${res.appSummary.topFunction}`);
                 }
                 else {
-                    this.log(`Loaded cached version of app ${app} with top function ${res.topFunction}`);
+                    this.log(`Loaded cached version of app ${app} with top function ${res.appSummary.topFunction}`);
                 }
             }
 
             try {
-                const success = this.runScript(app, res.topFunction, !invalidCache, config);
+                const success = this.runScript(app, res.appSummary.topFunction, !invalidCache, config);
                 if (!success) {
                     this.log(`${this.getScriptName()} failed for app ${app}`);
                     this.log("-".repeat(this.lineLength));

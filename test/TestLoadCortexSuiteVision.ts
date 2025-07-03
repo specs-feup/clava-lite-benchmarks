@@ -1,15 +1,17 @@
-import { copyDirents, loadApp, loadSuite } from "../src/LiteBenchmarkLoader.js";
+import { copyDirentsRelative, loadApp, LoadResult, loadSuite } from "../src/LiteBenchmarkLoader.js";
 import { CORTEXSUITE_VISION } from "../src/BenchmarkSuites.js";
 import { FileJp } from "@specs-feup/clava/api/Joinpoints.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 
-function handleApp(appName: string, direntsToCopy: string[]): void {
+function handleApp(res: LoadResult): void {
+    const name = res.appSummary.canonicalName;
+
     for (const file of Query.search(FileJp)) {
-        console.log(`App: ${appName}, file: ${file.filename}`);
+        console.log(`App: ${name}, file: ${file.filename}`);
     }
-    Clava.writeCode(`outputs/CortexSuite-Vision/${appName}`);
-    copyDirents(direntsToCopy, `outputs/CortexSuite-Vision/${appName}`);
+    Clava.writeCode(`outputs/CortexSuite-Vision/${name}`);
+    copyDirentsRelative(res.relativeDirents!, res.appRoot!, `outputs/CortexSuite-Vision/${name}`);
 }
 
 function loadOne(appName: string): void {
@@ -19,22 +21,23 @@ function loadOne(appName: string): void {
 
 
     const res = loadApp(suite, app);
-    handleApp(app.canonicalName, res.direntsToCopy ? res.direntsToCopy : []);
+    handleApp(res);
 }
 
 function loadAll(): void {
     const loader = loadSuite(CORTEXSUITE_VISION);
 
     for (const res of loader) {
+        const appSummary = res.appSummary;
         if (res.success) {
-            console.log(`Loaded app: ${res.app}, top function: ${res.topFunction}`);
-            handleApp(res.app.replace("vision-", ""), res.direntsToCopy ? res.direntsToCopy : []);
+            console.log(`Loaded app: ${appSummary.canonicalName}, top function: ${appSummary.topFunction}`);
+            handleApp(res);
         }
         else {
-            console.log(`Failed to load app: ${res.app}`);
+            console.log(`Failed to load app: ${appSummary.canonicalName}`);
         }
     }
 }
 
-//loadOne("vision-tracking");
+//loadOne("vision-disparity");
 loadAll();
