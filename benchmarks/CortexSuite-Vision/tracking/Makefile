@@ -23,7 +23,7 @@ run: $(ELF)
 	@echo "Running $(CMD)"
 	@$(CMD)
 
-run-perf:
+run-perf: $(ELF)
 	@echo "Running perf stat $N times on: $(CMD)"
 	@total=0; count=0; \
 	for i in $$(seq 1 $(N)); do \

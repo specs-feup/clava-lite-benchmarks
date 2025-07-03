@@ -11,7 +11,7 @@ for dir in "$DATA_DIR"/*/; do
     fi
 
     echo "=== Running: make run INPUT=$input_name ==="
-    make run INPUT="$input_name"
+    make run-perf INPUT="$input_name"
     make clean INPUT="$input_name"
     echo
 done

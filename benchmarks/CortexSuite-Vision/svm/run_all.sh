@@ -7,6 +7,6 @@ for dir in "$DATA_DIR"/*/; do
     input_name=$(basename "$dir")
 
     echo "=== Running: make run INPUT=$input_name ==="
-    make run INPUT="$input_name"
+    make run-perf INPUT="$input_name"
     echo
 done
