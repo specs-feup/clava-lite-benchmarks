@@ -22,9 +22,9 @@ export type AppSummary = {
     standard: string,
     topFunction: string,
     altTopFunction?: string
-    inputs?: string,
     amalgamate?: boolean,
-    extraFlags?: string[]
+    extraFlags?: string[],
+    extraFiles?: string[]
 }
 
 export type LoadResult = {
@@ -59,9 +59,15 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     Clava.getData().setStandard(appSummary.standard);
     log(`Selected standard: ${Clava.getStandard()}`);
 
-    Clava.getData().setFlags(suite.flags.join(" "));
+    const flags = [...suite.flags];
+    if (appSummary.extraFlags) {
+        flags.push(...appSummary.extraFlags);
+    }
+
     if (suite.flags.length > 0) {
-        log(`Selected flags: ${suite.flags.join(" ")}`);
+        const joinedFlags = flags.join(" ");
+        Clava.getData().setFlags(joinedFlags);
+        log(`Selected flags: ${joinedFlags}`);
     }
     else {
         log(`No Clang flags were selected`);
