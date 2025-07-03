@@ -139,7 +139,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             amalgamate: true
         }
     },
-    flags: []
+    flags: ["-DGENERATE_OUTPUT", "-DCHECK", "-lm"]
 };
 
 export const MACHSUITE: BenchmarkSuite = {

@@ -23,7 +23,8 @@ export type AppSummary = {
     topFunction: string,
     altTopFunction?: string
     inputs?: string,
-    amalgamate?: boolean
+    amalgamate?: boolean,
+    extraFlags?: string[]
 }
 
 export type LoadResult = {
