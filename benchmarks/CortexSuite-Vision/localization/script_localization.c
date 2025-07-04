@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
             float tempSum = 0;
             F2D *Ovel;
             float OvelNorm;
-            int i;
+            int ii;
 
             asubsref(STDDEV_GPSPos, 0) = asubsref(sData, 6);
             asubsref(STDDEV_GPSPos, 4) = asubsref(sData, 7);
@@ -248,8 +248,8 @@ int main(int argc, char *argv[])
 
             // Initialize
 
-            for (i = 0; i < (pos->height * pos->width); i++)
-                tempSum += asubsref(pos, i);
+            for (ii = 0; ii < (pos->height * pos->width); ii++)
+                tempSum += asubsref(pos, ii);
 
             if (tempSum == 0)
             {
@@ -257,8 +257,8 @@ int main(int argc, char *argv[])
                 t = fMtimes(randW, STDDEV_GPSPos);
                 t1 = fMtimes(ones, Opos);
 
-                for (i = 0; i < (pos->height * pos->width); i++)
-                    asubsref(pos, i) = asubsref(t, i) + asubsref(t1, i);
+                for (ii = 0; ii < (pos->height * pos->width); ii++)
+                    asubsref(pos, ii) = asubsref(t, ii) + asubsref(t1, ii);
 
                 fFreeHandle(t);
                 fFreeHandle(t1);
