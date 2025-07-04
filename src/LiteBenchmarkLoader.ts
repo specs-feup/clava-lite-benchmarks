@@ -214,6 +214,7 @@ function transformApp(appSummary: AppSummary): boolean {
             const amalgamator = new Amalgamator();
             const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
             amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+            Clava.rebuild();
             log(`Amalgamated files for ${appSummary.canonicalName}`);
         }
     } catch (error) {

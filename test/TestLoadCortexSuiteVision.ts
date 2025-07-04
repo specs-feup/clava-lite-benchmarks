@@ -39,5 +39,5 @@ function loadAll(): void {
     }
 }
 
-//loadOne("vision-disparity");
+//loadOne("vision-pca");
 loadAll();
