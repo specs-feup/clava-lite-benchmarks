@@ -291,3 +291,7 @@ benchmarks/CortexSuite-Vision/disparity/data/qcif/expected_C.txt
 benchmarks/CortexSuite-Vision/disparity/data/sim_fast/expected_C.txt
 
 benchmarks/CortexSuite-Vision/disparity/data/sim/expected_C.txt
+
+*.csv
+
+*.svg

@@ -58,9 +58,9 @@ run-prof: $(ELF)
 	@profiling/flamegraph.pl --title "CPU Flamegraph" --countname=Samples --width 1800 --colors hot --minwidth 0.5 out.folded > $(APP)_flamegraph.svg
 	@echo "Flamegraph generated: $(APP)_flamegraph.svg"
 	@sudo perf report --stdio --sort symbol --percent-limit 0 > perf-flat.txt
-	@python3 profiling/perf2csv.py
+	@python3 profiling/perf2csv.py $(APP)_profile.csv
 	@echo "CSV profile generated: perf-profile.csv"
-	@#rm -f out.perf out.folded perf.data perf.data.old perf-flat.txt
+	@rm -f out.perf out.folded perf.data perf.data.old perf-flat.txt
 
 clean:
 	rm -f $(ELF) out.perf out.folded perf.data perf.data.old perf-flat.txt $(OBJ) *.svg *.csv

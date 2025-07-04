@@ -1,8 +1,9 @@
 import csv
 import re
+import sys
 
 input_file = "perf-flat.txt"
-output_file = "perf-profile.csv"
+output_file = "perf-profile.csv" if len(sys.argv) < 2 else sys.argv[1]
 
 # Matches:
 # --0.01%--readImage
@@ -13,7 +14,6 @@ hexadecimal = re.compile(r"0x[0-9a-fA-F]+")
 
 with open(input_file, "r") as infile, open(output_file, "w", newline="") as outfile:
     fun_percentages = {}
-
     for line in infile:
         match = pattern.match(line)
         if match:
@@ -29,9 +29,13 @@ with open(input_file, "r") as infile, open(output_file, "w", newline="") as outf
     writer = csv.writer(outfile)
     writer.writerow(
         [
-            "function",
-            "percent",
+            "Function",
+            "% of runtime",
         ]
     )
-    for function, percent in fun_percentages.items():
-        writer.writerow([function, f"{percent:.2f}"])
+    sorted_funs = sorted(
+        fun_percentages.keys(), key=lambda x: fun_percentages[x], reverse=True
+    )
+    for fun in sorted_funs:
+        percent = fun_percentages[fun]
+        writer.writerow([fun, f"{percent:.2f}"])
