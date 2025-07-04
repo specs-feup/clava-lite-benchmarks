@@ -82,7 +82,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "disparity",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         },
         "vision-localization": {
             standard: "c11",
@@ -91,7 +91,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "localization",
             amalgamate: true,
             extraFlags: ["-Dvga"],
-            extraFiles: ["Makefile", "data/vga"]
+            extraFiles: ["Makefile", "data/vga", "run_all.sh"]
         },
         "vision-mser": {
             standard: "c11",
@@ -99,7 +99,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "mser",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         },
         "vision-multi-ncut": {
             standard: "c11",
@@ -107,14 +107,14 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "multi-ncut",
             amalgamate: true,
             extraFlags: ["-Dqcif"],
-            extraFiles: ["Makefile", "data/qcif"]
+            extraFiles: ["Makefile", "data/qcif", "run_all.sh"]
         },
         "vision-pca": {
             standard: "c11",
             topFunction: "pca",
             canonicalName: "pca",
             amalgamate: true,
-            extraFiles: ["Makefile", "data"]
+            extraFiles: ["Makefile", "data", "run_all.sh"]
         },
         "vision-sift": {
             standard: "c11",
@@ -122,7 +122,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "sift",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         },
         "vision-stitch": {
             standard: "c11",
@@ -130,7 +130,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "stitch",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         },
         "vision-svm": {
             standard: "c11",
@@ -138,7 +138,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "svm",
             amalgamate: true,
             extraFlags: ["-Dcif"],
-            extraFiles: ["Makefile", "data/cif"]
+            extraFiles: ["Makefile", "data/cif", "run_all.sh"]
         },
         "vision-texture-synthesis": {
             standard: "c11",
@@ -146,7 +146,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "texture-synthesis",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         },
         "vision-tracking": {
             standard: "c11",
@@ -155,7 +155,7 @@ export const CORTEXSUITE_VISION: BenchmarkSuite = {
             canonicalName: "tracking",
             amalgamate: true,
             extraFlags: ["-Dfullhd"],
-            extraFiles: ["Makefile", "data/fullhd"]
+            extraFiles: ["Makefile", "data/fullhd", "run_all.sh"]
         }
     },
     flags: ["-DGENERATE_OUTPUT", "-DCHECK", "-lm"]

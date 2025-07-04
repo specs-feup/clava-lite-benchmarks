@@ -1,5 +1,6 @@
 import { Amalgamator } from "@specs-feup/clava-code-transforms/Amalgamator";
 import { Outliner } from "@specs-feup/clava-code-transforms/Outliner";
+import { ScopeFlattener } from "@specs-feup/clava-code-transforms/ScopeFlattener";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 import ClavaJoinPoints from "@specs-feup/clava/api/clava/ClavaJoinPoints.js";
 import { FunctionJp, WrapperStmt } from "@specs-feup/clava/api/Joinpoints.js";
@@ -203,6 +204,12 @@ export function copyDirentsRelative(dirents: string[], originalPath: string, tar
 
 function transformApp(appSummary: AppSummary): boolean {
     try {
+        for (const fun of Query.search(FunctionJp)) {
+            const sf = new ScopeFlattener();
+            sf.flattenAllInFunction(fun);
+        }
+        Clava.rebuild();
+
         if (appSummary.amalgamate) {
             const amalgamator = new Amalgamator();
             const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
