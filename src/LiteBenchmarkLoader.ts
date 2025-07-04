@@ -209,11 +209,13 @@ function transformApp(appSummary: AppSummary): boolean {
             sf.flattenAllInFunction(fun);
         }
         Clava.rebuild();
+        log(`Flattened scopes for ${appSummary.canonicalName}`);
 
         if (appSummary.amalgamate) {
             const amalgamator = new Amalgamator();
             const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
             amalgamator.replaceAstWithAmalgamation(amalgFile, includes);
+            Clava.rebuild();
             log(`Amalgamated files for ${appSummary.canonicalName}`);
         }
     } catch (error) {
