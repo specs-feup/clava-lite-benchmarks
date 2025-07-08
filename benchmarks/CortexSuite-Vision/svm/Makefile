@@ -1,7 +1,7 @@
 # Benchmark-specific definitions
 APP = svm
 DEFAULT_INPUT = sim_fast
-N = 10
+N=10
 
 # General rules for any CortexSuite-Vision benchmark
 CC = clang
@@ -23,7 +23,42 @@ run: $(ELF)
 	@echo "Running $(CMD)"
 	@$(CMD)
 
-run-perf: $(ELF)
+exectime-time: $(ELF)
+	@echo "Running with millisecond timing $N times on: $(CMD)"
+	@total=0; count=0; \
+	for i in $$(seq 1 $(N)); do \
+		echo "Run $$i/$(N)..."; \
+		start=$$(date +%s%3N 2>/dev/null || echo "0"); \
+		if [ "$$start" = "0" ]; then \
+			echo "Warning: 'date +%s%3N' not supported, cannot measure milliseconds"; \
+			exit 1; \
+		fi; \
+		if [ $$i -eq 1 ]; then \
+			$(CMD); \
+		else \
+			$(CMD) > /dev/null; \
+		fi; \
+		end=$$(date +%s%3N 2>/dev/null || echo "0"); \
+		if [ "$$end" = "0" ]; then \
+			echo "Warning: 'date +%s%3N' not supported, cannot measure milliseconds"; \
+			exit 1; \
+		fi; \
+		elapsed=$$((end - start)); \
+		if [ "$$elapsed" -ge 0 ]; then \
+			total=$$((total + elapsed)); \
+			count=$$((count + 1)); \
+		else \
+			echo "Warning: Invalid elapsed time on run $$i"; \
+		fi; \
+	done; \
+	if [ $$count -gt 0 ]; then \
+		avg=$$(echo "scale=2; $$total / $$count" | bc); \
+		echo "Average elapsed time over $$count runs: $$avg ms"; \
+	else \
+		echo "No valid timings collected."; \
+	fi
+
+exectime-perf: $(ELF)
 	@echo "Running perf stat $N times on: $(CMD)"
 	@total=0; count=0; \
 	for i in $$(seq 1 $(N)); do \
@@ -50,7 +85,9 @@ run-perf: $(ELF)
 		echo "No valid task-clock times collected."; \
 	fi
 
-run-prof: $(ELF)
+
+
+profiling-perf: $(ELF)
 	@echo "Running perf on: $(CMD)"
 	@sudo perf record -F 72000 -g --call-graph dwarf --all-user -- $(CMD)
 	@sudo perf script > out.perf
