@@ -14,21 +14,31 @@ ARM_COMPILER ?= $(DEFAULT_ARM_COMPILER)
 
 # General rules for any CortexSuite-Vision benchmark
 ifeq ($(TARGET),x86_64)
-    CC = X86_64_COMPILER
-else ifeq ($(TARGET),arm)
+    CC = $(X86_64_COMPILER)
+else ifeq ($(TARGET),aarch64)
     CC = $(ARM_COMPILER)
 else
     $(error Unknown TARGET '$(TARGET)'; must be 'x86' or 'arm')
 endif
 
+ifeq ($(APP), $(notdir $(CURDIR)))
+    BASEFOLDER := .
+else ifeq ($(shell [ -d ./$(APP) ] && echo yes),yes)
+    BASEFOLDER := ./$(APP)
+else
+    $(error Directory './$(APP)' does not exist)
+endif
+
 CFLAGS = -w -O3 -fno-inline -fno-inline-functions -fno-inline-functions-called-once -fno-default-inline -fno-optimize-sibling-calls -fno-omit-frame-pointer -g
 LDFLAGS = -lm
-SRC = $(wildcard *.c)
+SRC := $(wildcard $(BASEFOLDER)/*.c)
 OBJ = $(SRC:.c=.o)
-ELF=$(APP)-$(INPUT).elf
-CMD = ./$(ELF) data/$(INPUT)
+ELF=$(APP)-$(INPUT)-$(TARGET).elf
+CMD = ./$(ELF) $(BASEFOLDER)/data/$(INPUT)
 
 # Targets
+all: $(ELF)
+
 help:
 	@echo "Usage: make [option] [VARIABLE=value]"
 	@echo ""
@@ -45,7 +55,7 @@ help:
 	@echo "Settable variables:"
 	@echo "  APP                Application name           Options: disparity, localization, mser, multi-ncut, pca, sift, stitch, svm, texture-synthesis, tracking (default: $(DEFAULT_APP))"
 	@echo "  INPUT              Input dataset              Options: sim, sim_fast, (other benchmark-dependent inputs) (default: $(DEFAULT_INPUT))"
-	@echo "  TARGET             Target architecture        Options: x86_64, arm (default: $(DEFAULT_TARGET))"
+	@echo "  TARGET             Target architecture        Options: x86_64, aarch64 (default: $(DEFAULT_TARGET))"
 	@echo "  N                  Number of runs for timing  Options: N > 0 (default: $(DEFAULT_N))"
 	@echo "  X86_64_COMPILER    Compiler for x86_64        (default: $(DEFAULT_X86_64_COMPILER))"
 	@echo "  ARM_COMPILER       Compiler for ARM           (default: $(DEFAULT_ARM_COMPILER))"
@@ -54,8 +64,6 @@ help:
 	@echo "  make APP=disparity INPUT=sim_fast TARGET=x86"
 	@echo "  make exectime-time N=100 APP=disparity INPUT=sim_fast TARGET=x86"
 	@echo "  make clean"
-
-all: $(ELF)
 
 $(ELF):
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
