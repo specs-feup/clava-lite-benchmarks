@@ -35,7 +35,14 @@ SRC := $(wildcard $(BASEFOLDER)/*.c)
 OBJ = $(SRC:.c=.o)
 ELFNAME=$(APP)-$(INPUT)-$(TARGET)
 ELF=$(ELFNAME).elf
-CMD = ./$(ELF) $(BASEFOLDER)/data/$(INPUT)
+
+ifeq ($(APP),pca)
+	ARGS = $(BASEFOLDER)/data/sat.trn 4435 37 $(INPUT)
+else
+	ARGS = $(BASEFOLDER)/data/$(INPUT)
+endif
+
+CMD = ./$(ELF) $(ARGS)
 
 # Targets
 $(ELF):
@@ -197,7 +204,7 @@ profiling-perf: $(ELF)
 			echo "SVG generated: $(ELFNAME)-callgraph.svg"; \
 			echo "Generating PNG from dotfile..."; \
 			dot -Tpng $(ELFNAME)-callgraph.dot -o $(ELFNAME)-callgraph.png; \
-			echo "PNG generated: $(ELFNAME)-callgraph
+			echo "PNG generated: $(ELFNAME)-callgraph"; \
 		else \
 			echo "Dot command not found, skipping SVG generation"; \
 		fi; \
@@ -216,7 +223,7 @@ profiling-perf: $(ELF)
 		echo "One or both scripts are missing from PATH, skipping"; \
 		echo "Get the scripts from https://github.com/brendangregg/FlameGraph and put them in your PATH"; \
 	fi
-	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old 
+	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old $(ELFNAME)-callgraph.txt $(ELFNAME)-callgraph-folded.txt
 
 clean:
 	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png

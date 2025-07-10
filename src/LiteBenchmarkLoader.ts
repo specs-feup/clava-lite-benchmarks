@@ -269,7 +269,7 @@ function ensureTopFunctionExists(name: string): void {
             const outliner = new Outliner();
 
             outliner.setDefaultPrefix("");
-            outliner.outlineWithName(begin, end, name);
+            //outliner.outlineWithName(begin, end, name);
 
             begin.detach();
             end.detach();
