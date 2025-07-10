@@ -38,20 +38,26 @@ ELF=$(ELFNAME).elf
 CMD = ./$(ELF) $(BASEFOLDER)/data/$(INPUT)
 
 # Targets
+$(ELF):
+	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
+
+.PHONY: all clean help run exectime-time exectime-perf profiling-perf exectime-time-allinputs exectime-perf-allinputs
+
 all: $(ELF)
 
 help:
 	@echo "Usage: make [option] [VARIABLE=value]"
 	@echo ""
 	@echo "Options:"
-	@echo "  all                Build the project (default)"
-	@echo "  clean              Remove build artifacts"
-	@echo "  help               Show this help message"
-	@echo "  run                Run the built application"
-	@echo "  exectime-time      Run the app N times and measure ms time using /usr/bin/time"
-	@echo "  exectime-perf      Run the app N times and measure time using perf stat"
-	@echo "  profiling-perf     Profile the app and generate a call graph using perf"
-	@echo
+	@echo "  all                      Build an application based on the APP, INPUT, and TARGET variables"
+	@echo "  clean                    Remove build artifacts"
+	@echo "  help                     Show this help message"
+	@echo "  run                      Run an application based on the APP, INPUT, and TARGET variables"
+	@echo "  exectime-time            Run an app N times and measure ms time using /usr/bin/time"
+	@echo "  exectime-time-allinputs  Run an app N times on all inputs in data folder using /usr/bin/time"
+	@echo "  exectime-perf            Run an app N times and measure time using perf stat"
+	@echo "  exectime-perf-allinputs  Run an app N times on all inputs in data folder using perf stat"
+	@echo "  profiling-perf           Profile an app and generate a call graph using perf"
 	@echo ""
 	@echo "Settable variables:"
 	@echo "  APP                Application name           Options: disparity, localization, mser, multi-ncut, pca, sift, stitch, svm, texture-synthesis, tracking (default: $(DEFAULT_APP))"
@@ -65,9 +71,6 @@ help:
 	@echo "  make APP=disparity INPUT=sim_fast TARGET=x86"
 	@echo "  make exectime-time N=100 APP=disparity INPUT=sim_fast TARGET=x86"
 	@echo "  make clean"
-
-$(ELF):
-	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
 
 run: $(ELF)
 	@echo "Running $(CMD)"
@@ -177,6 +180,7 @@ profiling-perf: $(ELF)
 		echo "CSV profile generated: $(ELFNAME)-profile.csv"; \
 	else \
 		echo "perf2csv.py is missing from PATH, skipping"; \
+		echo "Get the script from https://github.com/tiagolascasas/wonderland/PerfTools and put it in your PATH"; \
 	fi
 
 	@echo "Checking if both stackcollapse-perf.pl and flamegraph.pl are in PATH..."
@@ -187,11 +191,12 @@ profiling-perf: $(ELF)
 		echo "Flamegraph generated: $(APP)_flamegraph.svg"; \
 	else \
 		echo "One or both scripts are missing from PATH, skipping"; \
+		echo "Get the scripts from https://github.com/brendangregg/FlameGraph and put them in your PATH"; \
 	fi
 
 	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old $(ELFNAME)-flat.txt
 
 
 clean:
-	rm -f $(ELF) out.perf out.folded perf.data perf.data.old perf-flat.txt $(OBJ) *.svg *.csv
+	rm -f *.elf out.perf out.folded perf.data perf.data.old perf-flat.txt $(OBJ) *.svg *.csv
 
