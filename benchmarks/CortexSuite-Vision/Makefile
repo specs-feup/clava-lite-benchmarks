@@ -39,7 +39,9 @@ CMD = ./$(ELF) $(BASEFOLDER)/data/$(INPUT)
 
 # Targets
 $(ELF):
+	@echo "Building $(ELF) for APP=$(APP), INPUT=$(INPUT), TARGET=$(TARGET)"
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
+	@echo "Build complete: $(ELF) created"
 
 .PHONY: all clean help run exectime-time exectime-perf profiling-perf exectime-time-allinputs exectime-perf-allinputs
 
@@ -170,13 +172,13 @@ profiling-perf: $(ELF)
 	@echo "Running perf on: $(CMD)"
 	@sudo perf record -F 72000 -g --call-graph dwarf --all-user -- $(CMD)
 	@sudo perf script > $(ELFNAME).perf
-	@sudo perf report --stdio --sort symbol --percent-limit 0 > $(ELFNAME)-flat.txt
-	@echo "perf output saved to $(ELFNAME).perf and $(ELFNAME)-flat.txt"
+	@sudo perf report --stdio --sort symbol --percent-limit 0 > $(ELFNAME)-callgraph.txt
+	@echo "perf output saved to $(ELFNAME).perf and $(ELFNAME)-callgraph.txt"
 
 	@echo "Checking if perf2csv.py is in PATH..."
 	@if command -v perf2csv.py >/dev/null 2>&1; then \
 		echo "perf2csv.py found, generating CSV profile..."; \
-		python3 perf2csv.py $(ELFNAME)-flat.txt $(ELFNAME)-profile.csv; \
+		perf2csv.py $(ELFNAME)-callgraph.txt $(ELFNAME)-profile.csv; \
 		echo "CSV profile generated: $(ELFNAME)-profile.csv"; \
 	else \
 		echo "perf2csv.py is missing from PATH, skipping"; \
@@ -187,16 +189,14 @@ profiling-perf: $(ELF)
 	@if command -v stackcollapse-perf.pl >/dev/null 2>&1 && command -v flamegraph.pl >/dev/null 2>&1; then \
 		echo "Both scripts found, generating flamegraph..."; \
 		stackcollapse-perf.pl $(ELFNAME).perf > $(ELFNAME).perf.folded; \
-		flamegraph.pl --title "CPU Flamegraph" --countname=Samples --width 1800 --colors hot --minwidth 0.5 $(ELFNAME).perf.folded > $(APP)_flamegraph.svg; \
+		flamegraph.pl --title "CPU Flamegraph" --countname=Samples --width 1800 --colors hot --minwidth 0.5 $(ELFNAME).perf.folded > $(ELFNAME)-flamegraph.svg; \
 		echo "Flamegraph generated: $(APP)_flamegraph.svg"; \
 	else \
 		echo "One or both scripts are missing from PATH, skipping"; \
 		echo "Get the scripts from https://github.com/brendangregg/FlameGraph and put them in your PATH"; \
 	fi
-
-	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old $(ELFNAME)-flat.txt
-
+	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old 
 
 clean:
-	rm -f *.elf out.perf out.folded perf.data perf.data.old perf-flat.txt $(OBJ) *.svg *.csv
+	rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv
 
