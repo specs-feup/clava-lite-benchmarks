@@ -33,7 +33,8 @@ CFLAGS = -w -O3 -fno-inline -fno-inline-functions -fno-inline-functions-called-o
 LDFLAGS = -lm
 SRC := $(wildcard $(BASEFOLDER)/*.c)
 OBJ = $(SRC:.c=.o)
-ELF=$(APP)-$(INPUT)-$(TARGET).elf
+ELFNAME=$(APP)-$(INPUT)-$(TARGET)
+ELF=$(ELFNAME).elf
 CMD = ./$(ELF) $(BASEFOLDER)/data/$(INPUT)
 
 # Targets
@@ -107,6 +108,20 @@ exectime-time: $(ELF)
 		echo "No valid timings collected."; \
 	fi
 
+exectime-time-allinputs: $(ELF)
+	@echo "Running with millisecond timing $$N times on all inputs in: $(BASEFOLDER)/data"
+	@total=0; count=0; \
+	for dir in $(BASEFOLDER)/data/*/; do \
+		input_name=$$(basename "$$dir"); \
+		if [ "$$input_name" = "GroundData" ]; then \
+			echo "Skipping $$input_name"; \
+			continue; \
+		fi; \
+		echo "Running with input: $$input_name"; \
+		$(MAKE) exectime-time INPUT=$$input_name; \
+	done; \
+	echo "All inputs processed."
+
 exectime-perf: $(ELF)
 	@echo "Running perf stat $N times on: $(CMD)"
 	@total=0; count=0; \
@@ -134,19 +149,48 @@ exectime-perf: $(ELF)
 		echo "No valid task-clock times collected."; \
 	fi
 
-
+exectime-perf-allinputs: $(ELF)
+	@echo "Running perf stat $$N times on all inputs in: $(BASEFOLDER)/data"
+	@total=0; count=0; \
+	for dir in $(BASEFOLDER)/data/*/; do \
+		input_name=$$(basename "$$dir"); \
+		if [ "$$input_name" = "GroundData" ]; then \
+			echo "Skipping $$input_name"; \
+			continue; \
+		fi; \
+		echo "Running with input: $$input_name"; \
+		$(MAKE) exectime-perf INPUT=$$input_name; \
+	done; \
+	echo "All inputs processed."
 
 profiling-perf: $(ELF)
 	@echo "Running perf on: $(CMD)"
 	@sudo perf record -F 72000 -g --call-graph dwarf --all-user -- $(CMD)
-	@sudo perf script > out.perf
-	@profiling/stackcollapse-perf.pl out.perf > out.folded
-	@profiling/flamegraph.pl --title "CPU Flamegraph" --countname=Samples --width 1800 --colors hot --minwidth 0.5 out.folded > $(APP)_flamegraph.svg
-	@echo "Flamegraph generated: $(APP)_flamegraph.svg"
-	@sudo perf report --stdio --sort symbol --percent-limit 0 > perf-flat.txt
-	@python3 profiling/perf2csv.py $(APP)_profile.csv
-	@echo "CSV profile generated: perf-profile.csv"
-	@rm -f out.perf out.folded perf.data perf.data.old perf-flat.txt
+	@sudo perf script > $(ELFNAME).perf
+	@sudo perf report --stdio --sort symbol --percent-limit 0 > $(ELFNAME)-flat.txt
+	@echo "perf output saved to $(ELFNAME).perf and $(ELFNAME)-flat.txt"
+
+	@echo "Checking if perf2csv.py is in PATH..."
+	@if command -v perf2csv.py >/dev/null 2>&1; then \
+		echo "perf2csv.py found, generating CSV profile..."; \
+		python3 perf2csv.py $(ELFNAME)-flat.txt $(ELFNAME)-profile.csv; \
+		echo "CSV profile generated: $(ELFNAME)-profile.csv"; \
+	else \
+		echo "perf2csv.py is missing from PATH, skipping"; \
+	fi
+
+	@echo "Checking if both stackcollapse-perf.pl and flamegraph.pl are in PATH..."
+	@if command -v stackcollapse-perf.pl >/dev/null 2>&1 && command -v flamegraph.pl >/dev/null 2>&1; then \
+		echo "Both scripts found, generating flamegraph..."; \
+		stackcollapse-perf.pl $(ELFNAME).perf > $(ELFNAME).perf.folded; \
+		flamegraph.pl --title "CPU Flamegraph" --countname=Samples --width 1800 --colors hot --minwidth 0.5 $(ELFNAME).perf.folded > $(APP)_flamegraph.svg; \
+		echo "Flamegraph generated: $(APP)_flamegraph.svg"; \
+	else \
+		echo "One or both scripts are missing from PATH, skipping"; \
+	fi
+
+	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old $(ELFNAME)-flat.txt
+
 
 clean:
 	rm -f $(ELF) out.perf out.folded perf.data perf.data.old perf-flat.txt $(OBJ) *.svg *.csv

@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
 import csv
 import re
 import sys
 
-input_file = "perf-flat.txt"
-output_file = "perf-profile.csv" if len(sys.argv) < 2 else sys.argv[1]
+input_file = "perf-flat.txt" if len(sys.argv) < 2 else sys.argv[1]
+output_file = "perf-profile.csv" if len(sys.argv) < 3 else sys.argv[2]
 
 # Matches:
 # --0.01%--readImage
