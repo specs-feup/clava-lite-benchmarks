@@ -173,7 +173,8 @@ profiling-perf: $(ELF)
 	@sudo perf record -F 72000 -g --call-graph dwarf --all-user -- $(CMD)
 	@sudo perf script > $(ELFNAME).perf
 	@sudo perf report --stdio --sort symbol --percent-limit 0 > $(ELFNAME)-callgraph.txt
-	@echo "perf output saved to $(ELFNAME).perf and $(ELFNAME)-callgraph.txt"
+	@sudo perf report --stdio --call-graph=folded > $(ELFNAME)-callgraph-folded.txt
+	@echo "perf output saved to $(ELFNAME).perf, $(ELFNAME)-callgraph.txt and $(ELFNAME)-callgraph-folded.txt"
 
 	@echo "Checking if perf2csv.py is in PATH..."
 	@if command -v perf2csv.py >/dev/null 2>&1; then \
@@ -184,7 +185,27 @@ profiling-perf: $(ELF)
 		echo "perf2csv.py is missing from PATH, skipping"; \
 		echo "Get the script from https://github.com/tiagolascasas/wonderland/PerfTools and put it in your PATH"; \
 	fi
-
+	@echo ""
+	@echo "Checking if perf2dotfile.py is in PATH..."
+	@if command -v perf2dotfile.py >/dev/null 2>&1; then \
+		echo "perf2csv.py found, generating CSV profile..."; \
+		perf2dotfile.py $(ELFNAME)-callgraph-folded.txt $(ELFNAME)-callgraph.dot -f; \
+		echo "Dotfile generated: $(ELFNAME)-callgraph.dot"; \
+		if command -v dot >/dev/null 2>&1; then \
+			echo "Generating SVG from dotfile..."; \
+			dot -Tsvg $(ELFNAME)-callgraph.dot -o $(ELFNAME)-callgraph.svg; \
+			echo "SVG generated: $(ELFNAME)-callgraph.svg"; \
+			echo "Generating PNG from dotfile..."; \
+			dot -Tpng $(ELFNAME)-callgraph.dot -o $(ELFNAME)-callgraph.png; \
+			echo "PNG generated: $(ELFNAME)-callgraph
+		else \
+			echo "Dot command not found, skipping SVG generation"; \
+		fi; \
+	else \
+		echo "perf2dotfile.py is missing from PATH, skipping"; \
+		echo "Get the script from https://github.com/tiagolascasas/wonderland/PerfTools and put it in your PATH"; \
+	fi
+	@echo ""
 	@echo "Checking if both stackcollapse-perf.pl and flamegraph.pl are in PATH..."
 	@if command -v stackcollapse-perf.pl >/dev/null 2>&1 && command -v flamegraph.pl >/dev/null 2>&1; then \
 		echo "Both scripts found, generating flamegraph..."; \
@@ -198,5 +219,5 @@ profiling-perf: $(ELF)
 	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old 
 
 clean:
-	rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv
+	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png
 
