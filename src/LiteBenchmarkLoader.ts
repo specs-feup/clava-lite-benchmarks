@@ -190,9 +190,10 @@ export function copyDirentsRelative(dirents: string[], originalPath: string, tar
     }
 
     for (const dirent of dirents) {
+        const outName = dirent.startsWith("../") ? dirent.replace("../", "") : dirent;
         const fullPath = path.join(originalPath, dirent);
         if (existsSync(fullPath)) {
-            const destPath = join(targetPath, dirent);
+            const destPath = join(targetPath, outName);
             copyRecursive(fullPath, destPath);
             log(`Copied ${dirent} to ${destPath}`);
         }
