@@ -25,10 +25,10 @@ Internet:     murtagh@scivax.stsci.edu
 F. Murtagh, Munich, 6 June 1989                                   */
 /*********************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define SIGN(a, b) ((b) < 0 ? -fabs(a) : fabs(a))
 
@@ -72,8 +72,7 @@ void corcol(float **data, int n, int m, float **symmat)
         stddev[j] = 0.0;
         for (i = 1; i <= n; i++)
         {
-            stddev[j] += ((data[i][j] - mean[j]) *
-                          (data[i][j] - mean[j]));
+            stddev[j] += ((data[i][j] - mean[j]) * (data[i][j] - mean[j]));
         }
         stddev[j] /= (float)n;
         stddev[j] = sqrt(stddev[j]);
@@ -390,8 +389,9 @@ void tqli(float d[], float e[], int n, float **z)
             }
             if (m != l)
             {
-                if (iter++ == 30)
+                if (iter == 30)
                     erhand("No convergence in TLQI.");
+                iter++; // SPeCS: moved this here from its previous location at the if condition
                 g = (d[l + 1] - d[l]) / (2.0 * e[l]);
                 r = sqrt((g * g) + 1.0);
                 g = d[m] - d[l] + e[l] / (g + SIGN(r, g));
@@ -474,8 +474,7 @@ int main(int argc, char *argv[])
 
     if ((stream = fopen(argv[1], "r")) == NULL)
     {
-        fprintf(stderr, "Program %s : cannot open file %s\n",
-                argv[0], argv[1]);
+        fprintf(stderr, "Program %s : cannot open file %s\n", argv[0], argv[1]);
         fprintf(stderr, "Exiting to system.");
         exit(1);
         /* Note: in versions of DOS prior to 3.0, argv[0] contains the
@@ -621,7 +620,8 @@ int main(int argc, char *argv[])
             for (k2 = 1; k2 <= m; k2++)
             {
                 data[i][k] += interm[k2] * symmat[k2][m - k + 1];
-                printf("Iteration i= %d, j = %d k=%d, k2=%d : data = %lf\n", i, j, k, k2, data[i][k]);
+                printf("Iteration i= %d, j = %d k=%d, k2=%d : data = %lf\n", i, j, k,
+                       k2, data[i][k]);
             }
             printf("\n");
         }

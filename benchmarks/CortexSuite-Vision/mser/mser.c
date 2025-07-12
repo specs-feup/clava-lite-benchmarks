@@ -700,8 +700,12 @@ I2D *mser(I2D *I, int in_delta)
                 idx_t region = regions_pt[i].maxstable;
 
                 /* skip if not extremal region */
-                if (region-- == 0)
+                if (region == 0)
+                {
+                    region--; // SPeCS: moved this from outside the if condition
                     continue;
+                }
+                region--;
                 sref(ell_pt, d + gdl * region) = sref(acc_pt, regions_pt[i].index);
             }
 

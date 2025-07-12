@@ -39,5 +39,5 @@ function loadAll(): void {
     }
 }
 
-//loadOne("vision-disparity");
-loadAll();
+loadOne("vision-sift");
+//loadAll();
