@@ -110,6 +110,7 @@ F2D *siftlocalmax(F2D *in, float thresh, int intervals, int M, int N)
      * offset(+1,...,+1,0,...,0). */
     i = 0;
 
+    char end_loop_chain = 0;
     while (1)
     {
         if (o != 0)
@@ -123,11 +124,16 @@ F2D *siftlocalmax(F2D *in, float thresh, int intervals, int M, int N)
             o -= 3 * offsets[h];
             midx[h] = -1;
             if (++h >= ndims)
-                goto stop;
+            {
+                end_loop_chain = 1;
+                break;
+            }
+        }
+        if (end_loop_chain)
+        {
+            break;
         }
     }
-
-stop:;
 
     /* Starts at the corner (1,1,...,1,0,0,...0) */
     for (h = 0; h < ndims; ++h)
@@ -147,8 +153,25 @@ stop:;
     */
 
     for (h = 0; h < ndims; ++h)
+    {
         if (dims[h] < 3)
-            goto end;
+        {
+
+            {
+                int i = 0;
+                out = fMallocHandle(1, maxIter);
+
+                for (i = 0; i < maxIter; i++)
+                    asubsref(out, i) = maxima_iterator[i];
+            }
+
+            /* Release space. */
+            free(neighbors);
+            free(maxima_start);
+
+            return out;
+        }
+    }
 
     while (1)
     {
@@ -159,7 +182,45 @@ stop:;
         {
             midx[h] = 1;
             if (++h >= ndims)
-                goto next_layer;
+            {
+                if (h >= ndims)
+                {
+                    {
+                        int i = 0;
+                        out = fMallocHandle(1, maxIter);
+
+                        for (i = 0; i < maxIter; i++)
+                            asubsref(out, i) = maxima_iterator[i];
+                    }
+
+                    /* Release space. */
+                    free(neighbors);
+                    free(maxima_start);
+
+                    return out;
+                }
+
+                while ((++midx[h]) >= dims[h])
+                {
+                    midx[h] = 0;
+                    if (++h >= ndims)
+                    {
+                        {
+                            int i = 0;
+                            out = fMallocHandle(1, maxIter);
+
+                            for (i = 0; i < maxIter; i++)
+                                asubsref(out, i) = maxima_iterator[i];
+                        }
+
+                        /* Release space. */
+                        free(neighbors);
+                        free(maxima_start);
+
+                        return out;
+                    }
+                }
+            }
             ++midx[h];
         }
 
@@ -206,20 +267,48 @@ stop:;
             ++midx[0];
             continue;
 
-        next_layer:;
+            // next_layer:;
             if (h >= ndims)
-                goto end;
+            {
+                {
+                    int i = 0;
+                    out = fMallocHandle(1, maxIter);
+
+                    for (i = 0; i < maxIter; i++)
+                        asubsref(out, i) = maxima_iterator[i];
+                }
+
+                /* Release space. */
+                free(neighbors);
+                free(maxima_start);
+
+                return out;
+            }
 
             while ((++midx[h]) >= dims[h])
             {
                 midx[h] = 0;
                 if (++h >= ndims)
-                    goto end;
+                {
+                    {
+                        int i = 0;
+                        out = fMallocHandle(1, maxIter);
+
+                        for (i = 0; i < maxIter; i++)
+                            asubsref(out, i) = maxima_iterator[i];
+                    }
+
+                    /* Release space. */
+                    free(neighbors);
+                    free(maxima_start);
+
+                    return out;
+                }
             }
         }
     }
 
-end:;
+    // end:
     /* Return. */
     {
         int i = 0;
