@@ -205,13 +205,6 @@ export function copyDirentsRelative(dirents: string[], originalPath: string, tar
 
 function transformApp(appSummary: AppSummary): boolean {
     try {
-        for (const fun of Query.search(FunctionJp)) {
-            const sf = new ScopeFlattener();
-            sf.flattenAllInFunction(fun);
-        }
-        Clava.rebuild();
-        log(`Flattened scopes for ${appSummary.canonicalName}`);
-
         if (appSummary.amalgamate) {
             const amalgamator = new Amalgamator();
             const [amalgFile, includes] = amalgamator.amalgamate(appSummary.canonicalName);
@@ -219,6 +212,12 @@ function transformApp(appSummary: AppSummary): boolean {
             Clava.rebuild();
             log(`Amalgamated files for ${appSummary.canonicalName}`);
         }
+        for (const fun of Query.search(FunctionJp)) {
+            const sf = new ScopeFlattener();
+            sf.flattenAllInFunction(fun);
+        }
+        Clava.rebuild();
+        log(`Flattened scopes for ${appSummary.canonicalName}`);
     } catch (error) {
         log(`Error amalgamating files for ${appSummary.canonicalName}: ${error}`);
         return false;
@@ -269,7 +268,7 @@ function ensureTopFunctionExists(name: string): void {
             const outliner = new Outliner();
 
             outliner.setDefaultPrefix("");
-            //outliner.outlineWithName(begin, end, name);
+            outliner.outlineWithName(begin, end, name);
 
             begin.detach();
             end.detach();
