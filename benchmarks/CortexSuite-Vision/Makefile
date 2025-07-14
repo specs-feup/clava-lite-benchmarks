@@ -25,8 +25,10 @@ ifeq ($(APP), $(notdir $(CURDIR)))
     BASEFOLDER := .
 else ifeq ($(shell [ -d ./$(APP) ] && echo yes),yes)
     BASEFOLDER := ./$(APP)
+else ifeq ($(shell [ -d ./data ] && echo yes),yes)
+    BASEFOLDER := .
 else
-    $(error Directory './$(APP)' does not exist)
+    $(error Could not find source folder for APP '$(APP)'; expected ./$(APP) or the current directory to contain ./data)
 endif
 
 CFLAGS = -w -O3 -fno-inline -fno-inline-functions -fno-inline-functions-called-once -fno-default-inline -fno-optimize-sibling-calls -fno-omit-frame-pointer -g
@@ -50,7 +52,7 @@ $(ELF):
 	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
 	@echo "Build complete: $(ELF) created"
 
-.PHONY: all clean help run exectime-time exectime-perf profiling-perf exectime-time-allinputs exectime-perf-allinputs
+.PHONY: all clean help run exectime-time allinputs exectime-perf profiling-perf exectime-time-allinputs exectime-perf-allinputs
 
 all: $(ELF)
 
@@ -62,6 +64,7 @@ help:
 	@echo "  clean                    Remove build artifacts"
 	@echo "  help                     Show this help message"
 	@echo "  run                      Run an application based on the APP, INPUT, and TARGET variables"
+	@echo "  run-allinputs            Run an application based on the APP and TARGET variables on all inputs in the data folder"
 	@echo "  exectime-time            Run an app N times and measure ms time using /usr/bin/time"
 	@echo "  exectime-time-allinputs  Run an app N times on all inputs in data folder using /usr/bin/time"
 	@echo "  exectime-perf            Run an app N times and measure time using perf stat"
@@ -84,6 +87,19 @@ help:
 run: $(ELF)
 	@echo "Running $(CMD)"
 	@$(CMD)
+
+run-allinputs: $(ELF)
+	@echo "Running $(CMD) on all inputs in: $(BASEFOLDER)/data"
+	@for dir in $(BASEFOLDER)/data/*/; do \
+		input_name=$$(basename "$$dir"); \
+		if [ "$$input_name" = "GroundData" ]; then \
+			echo "Skipping $$input_name"; \
+			continue; \
+		fi; \
+		echo "Running with input: $$input_name"; \
+		$(MAKE) run INPUT=$$input_name; \
+	done; \
+	echo "All inputs processed."
 
 exectime-time: $(ELF)
 	@echo "Running with millisecond timing $N times on: $(CMD)"
