@@ -689,9 +689,9 @@ I2D *mser(I2D *I, int in_delta)
             /* integrate parameter */
             for (i = 0; i < njoins; ++i)
             {
-                idx_t index = sref(joins_pt, i);
-                idx_t parent = forest_pt[index].parent;
-                sref(acc_pt, parent) += sref(acc_pt, index);
+                idx_t index_sref = sref(joins_pt, i);
+                idx_t parent = forest_pt[index_sref].parent;
+                sref(acc_pt, parent) += sref(acc_pt, index_sref);
             }
 
             /* save back to ellpises */
