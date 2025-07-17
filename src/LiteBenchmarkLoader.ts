@@ -40,11 +40,11 @@ export function appList(suite: BenchmarkSuite): string[] {
     return Object.keys(suite.apps);
 }
 
-export function* loadSuite(suite: BenchmarkSuite): Generator<LoadResult> {
+export function* loadSuite(suite: BenchmarkSuite, overridePath?: string): Generator<LoadResult> {
     for (const app of appList(suite)) {
         log(`Loading app: ${app}`);
 
-        const res = loadApp(suite, suite.apps[app]);
+        const res = loadApp(suite, suite.apps[app], overridePath ? overridePath : undefined);
         yield res;
     }
 }
