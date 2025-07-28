@@ -25,7 +25,8 @@ export type AppSummary = {
     altTopFunction?: string
     amalgamate?: boolean,
     extraFlags?: string[],
-    extraFiles?: string[]
+    extraFiles?: string[],
+    extraSourceFiles?: string[],
 }
 
 export type LoadResult = {
@@ -88,6 +89,21 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     const [sources, absoluteNonSources, absoluteSubdirs] = readSourcesInFolder(fullPath);
     log(`Found ${sources.length} files for ${appSummary.canonicalName}`);
 
+    let extraSources: string[] = [];
+    for (let extraSource of (appSummary.extraSourceFiles ?? [])) {
+        extraSource = path.join(fullPath, extraSource);
+        if (Io.isFile(extraSource)) {
+            extraSources.push(extraSource);
+            continue;
+        }
+        
+        if (Io.isFolder(extraSource)) {
+            const [nestedExtraSources, _, __] = readSourcesInFolder(extraSource);
+            extraSources.push(...nestedExtraSources);
+        }
+    }
+    log(`Found ${extraSources.length} extra source files for ${appSummary.canonicalName}`);
+
     if (absoluteNonSources.length > 0) {
         log(`Found ${absoluteNonSources.length} non-source files for ${appSummary.canonicalName}`);
     }
@@ -126,9 +142,14 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     let keepTrying = true;
     do {
         Clava.pushAst(ClavaJoinPoints.program());
+        for (const extraSource of extraSources) {
+            Clava.addExistingFile(extraSource);
+        }
+
         for (const source of sources) {
             Clava.addExistingFile(source);
         }
+        
         keepTrying = Clava.rebuild();
 
         if (!keepTrying) {

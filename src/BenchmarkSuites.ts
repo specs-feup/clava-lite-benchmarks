@@ -266,3 +266,448 @@ export const SPEC2017: BenchmarkSuite = {
     },
     flags: ["-lm"]
 };
+
+export const POLYBENCH_4_2_MINI: BenchmarkSuite = {
+    name: "POLYBENCH4.2",
+    path: "benchmarks/Polybench/4.2/",
+    apps: {
+        "2mm": {
+            standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"]
+        },
+        "3mm": {
+            standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"]
+        },
+        "adi": {
+            standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"]
+        },
+        "atax": {
+            standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"]
+        },
+        "bicg": {
+            standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"]
+        },
+        "cholesky": {
+            standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"]
+        },
+        "correlation": {
+            standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"]
+        },
+        "covariance": {
+            standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"]
+        },
+        "deriche": {
+            standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"]
+        },
+        "doitgen": {
+            standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"]
+        },
+        "durbin": {
+            standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"]
+        },
+        "gemm": {
+            standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"]
+        },
+        "gemver": {
+            standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"]
+        },
+        "gesummv": {
+            standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"]
+        },
+        "gramschmidt": {
+            standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"]
+        },
+        "heat_3d": {
+            standard: "c11", topFunction: "main", canonicalName: "heat_3d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_1d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_1d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_2d", extraSourceFiles: ["../polybench"]
+        },
+        "lu": {
+            standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"]
+        },
+        "ludcmp": {
+            standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"]
+        },
+        "mvt": {
+            standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"]
+        },
+        "seidel_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "seidel_2d", extraSourceFiles: ["../polybench"]
+        },
+        "symm": {
+            standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"]
+        },
+        "syr2k": {
+            standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"]
+        },
+        "syrk": {
+            standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"]
+        },
+        "trisolv": {
+            standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"]
+        },
+        "trmm": {
+            standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"]
+        }
+    },
+    flags: ["-lm", "-DPOLYBENCH_TIME", "-DMINI_DATASET"]
+}
+
+export const POLYBENCH_4_2_SMALL: BenchmarkSuite = {
+    name: "POLYBENCH4.2",
+    path: "benchmarks/Polybench/4.2/",
+    apps: {
+        "2mm": {
+            standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"]
+        },
+        "3mm": {
+            standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"]
+        },
+        "adi": {
+            standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"]
+        },
+        "atax": {
+            standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"]
+        },
+        "bicg": {
+            standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"]
+        },
+        "cholesky": {
+            standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"]
+        },
+        "correlation": {
+            standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"]
+        },
+        "covariance": {
+            standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"]
+        },
+        "deriche": {
+            standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"]
+        },
+        "doitgen": {
+            standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"]
+        },
+        "durbin": {
+            standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"]
+        },
+        "gemm": {
+            standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"]
+        },
+        "gemver": {
+            standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"]
+        },
+        "gesummv": {
+            standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"]
+        },
+        "gramschmidt": {
+            standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"]
+        },
+        "heat_3d": {
+            standard: "c11", topFunction: "main", canonicalName: "heat_3d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_1d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_1d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_2d", extraSourceFiles: ["../polybench"]
+        },
+        "lu": {
+            standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"]
+        },
+        "ludcmp": {
+            standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"]
+        },
+        "mvt": {
+            standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"]
+        },
+        "seidel_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "seidel_2d", extraSourceFiles: ["../polybench"]
+        },
+        "symm": {
+            standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"]
+        },
+        "syr2k": {
+            standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"]
+        },
+        "syrk": {
+            standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"]
+        },
+        "trisolv": {
+            standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"]
+        },
+        "trmm": {
+            standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"]
+        }
+    },
+    flags: ["-lm", "-DPOLYBENCH_TIME", "-DSMALL_DATASET"]
+}
+
+export const POLYBENCH_4_2_MEDIUM: BenchmarkSuite = {
+    name: "POLYBENCH4.2",
+    path: "benchmarks/Polybench/4.2/",
+    apps: {
+        "2mm": {
+            standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"]
+        },
+        "3mm": {
+            standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"]
+        },
+        "adi": {
+            standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"]
+        },
+        "atax": {
+            standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"]
+        },
+        "bicg": {
+            standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"]
+        },
+        "cholesky": {
+            standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"]
+        },
+        "correlation": {
+            standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"]
+        },
+        "covariance": {
+            standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"]
+        },
+        "deriche": {
+            standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"]
+        },
+        "doitgen": {
+            standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"]
+        },
+        "durbin": {
+            standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"]
+        },
+        "gemm": {
+            standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"]
+        },
+        "gemver": {
+            standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"]
+        },
+        "gesummv": {
+            standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"]
+        },
+        "gramschmidt": {
+            standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"]
+        },
+        "heat_3d": {
+            standard: "c11", topFunction: "main", canonicalName: "heat_3d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_1d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_1d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_2d", extraSourceFiles: ["../polybench"]
+        },
+        "lu": {
+            standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"]
+        },
+        "ludcmp": {
+            standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"]
+        },
+        "mvt": {
+            standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"]
+        },
+        "seidel_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "seidel_2d", extraSourceFiles: ["../polybench"]
+        },
+        "symm": {
+            standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"]
+        },
+        "syr2k": {
+            standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"]
+        },
+        "syrk": {
+            standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"]
+        },
+        "trisolv": {
+            standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"]
+        },
+        "trmm": {
+            standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"]
+        }
+    },
+    flags: ["-lm", "-DPOLYBENCH_TIME", "-DMEDIUM_DATASET"]
+}
+
+export const POLYBENCH_4_2_LARGE: BenchmarkSuite = {
+    name: "POLYBENCH4.2",
+    path: "benchmarks/Polybench/4.2/",
+    apps: {
+        "2mm": {
+            standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"]
+        },
+        "3mm": {
+            standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"]
+        },
+        "adi": {
+            standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"]
+        },
+        "atax": {
+            standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"]
+        },
+        "bicg": {
+            standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"]
+        },
+        "cholesky": {
+            standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"]
+        },
+        "correlation": {
+            standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"]
+        },
+        "covariance": {
+            standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"]
+        },
+        "deriche": {
+            standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"]
+        },
+        "doitgen": {
+            standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"]
+        },
+        "durbin": {
+            standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"]
+        },
+        "gemm": {
+            standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"]
+        },
+        "gemver": {
+            standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"]
+        },
+        "gesummv": {
+            standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"]
+        },
+        "gramschmidt": {
+            standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"]
+        },
+        "heat_3d": {
+            standard: "c11", topFunction: "main", canonicalName: "heat_3d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_1d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_1d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_2d", extraSourceFiles: ["../polybench"]
+        },
+        "lu": {
+            standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"]
+        },
+        "ludcmp": {
+            standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"]
+        },
+        "mvt": {
+            standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"]
+        },
+        "seidel_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "seidel_2d", extraSourceFiles: ["../polybench"]
+        },
+        "symm": {
+            standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"]
+        },
+        "syr2k": {
+            standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"]
+        },
+        "syrk": {
+            standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"]
+        },
+        "trisolv": {
+            standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"]
+        },
+        "trmm": {
+            standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"]
+        }
+    },
+    flags: ["-lm", "-DPOLYBENCH_TIME", "-DLARGE_DATASET"]
+}
+
+export const POLYBENCH_4_2_EXTRALARGE: BenchmarkSuite = {
+    name: "POLYBENCH4.2",
+    path: "benchmarks/Polybench/4.2/",
+    apps: {
+        "2mm": {
+            standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"]
+        },
+        "3mm": {
+            standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"]
+        },
+        "adi": {
+            standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"]
+        },
+        "atax": {
+            standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"]
+        },
+        "bicg": {
+            standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"]
+        },
+        "cholesky": {
+            standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"]
+        },
+        "correlation": {
+            standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"]
+        },
+        "covariance": {
+            standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"]
+        },
+        "deriche": {
+            standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"]
+        },
+        "doitgen": {
+            standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"]
+        },
+        "durbin": {
+            standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"]
+        },
+        "gemm": {
+            standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"]
+        },
+        "gemver": {
+            standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"]
+        },
+        "gesummv": {
+            standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"]
+        },
+        "gramschmidt": {
+            standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"]
+        },
+        "heat_3d": {
+            standard: "c11", topFunction: "main", canonicalName: "heat_3d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_1d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_1d", extraSourceFiles: ["../polybench"]
+        },
+        "jacobi_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "jacobi_2d", extraSourceFiles: ["../polybench"]
+        },
+        "lu": {
+            standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"]
+        },
+        "ludcmp": {
+            standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"]
+        },
+        "mvt": {
+            standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"]
+        },
+        "seidel_2d": {
+            standard: "c11", topFunction: "main", canonicalName: "seidel_2d", extraSourceFiles: ["../polybench"]
+        },
+        "symm": {
+            standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"]
+        },
+        "syr2k": {
+            standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"]
+        },
+        "syrk": {
+            standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"]
+        },
+        "trisolv": {
+            standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"]
+        },
+        "trmm": {
+            standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"]
+        }
+    },
+    flags: ["-lm", "-DPOLYBENCH_TIME", "-DEXTRALARGE_DATASET"]
+}
