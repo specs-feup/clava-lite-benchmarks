@@ -11,46 +11,79 @@ import { copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync } from "fs"
 import path, { basename, join } from "path";
 import { fileURLToPath } from "url";
 
-export type BenchmarkSuite = {
-    name: string,
-    path: string,
-    apps: { [key: string]: AppSummary },
-    flags: string[],
+export abstract class BenchmarkSuite<InputSize extends string> {
+    public name: string;
+    public path: string;
+    public apps: { [key: string]: AppSummary<InputSize> };
+    public flags: string[];
+    public enumObject: { [k: string]: InputSize };
+
+    protected constructor(name: string, enumObject: { [k: string]: InputSize }, path: string, apps: { [key: string]: AppSummary<InputSize> }, flags: string[]) {
+        this.name = name;
+        this.path = path;
+        this.apps = apps;
+        this.flags = flags;
+        this.enumObject = enumObject;
+    }
 };
 
-export type AppSummary = {
+export type AppSummary<InputSizes> = {
     canonicalName: string,
     standard: string,
     topFunction: string,
     altTopFunction?: string
     amalgamate?: boolean,
+    invalidInputSizes: InputSizes[],
     extraFlags?: string[],
     extraFiles?: string[],
     extraSourceFiles?: string[],
 }
 
-export type LoadResult = {
+export type LoadResult<InputSize extends string> = {
     success: boolean,
-    appSummary: AppSummary,
+    appSummary: AppSummary<InputSize>,
     absoluteDirents?: string[],
     relativeDirents?: string[],
     appRoot?: string
 }
 
-export function appList(suite: BenchmarkSuite): string[] {
+export function appList<InputSize extends string>(suite: BenchmarkSuite<InputSize>): string[] {
     return Object.keys(suite.apps);
 }
 
-export function* loadSuite(suite: BenchmarkSuite, overridePath?: string): Generator<LoadResult> {
-    for (const app of appList(suite)) {
-        log(`Loading app: ${app}`);
+export function* loadSuite<InputSize extends string>(suite: BenchmarkSuite<InputSize>, overridePath?: string, ...inputSizes: InputSize[]): Generator<LoadResult<InputSize>> {
+    inputSizes = inputSizes.length === 0 ? Object.values(suite.enumObject) : inputSizes;
 
-        const res = loadApp(suite, suite.apps[app], overridePath ? overridePath : undefined);
-        yield res;
+    for (const inputSize of inputSizes) {
+        log(`Loading apps for input size «${Object.keys(suite.enumObject).find(
+            key => suite.enumObject[key] === inputSize
+        )}»`);
+
+        for (const appName of appList(suite)) {
+            if (suite.apps[appName].invalidInputSizes.includes(inputSize)) {
+                log(`Skipping app «${appName}» since the current input size isn't supported`);
+                continue;
+            }
+            log(`Loading app: ${appName}`);
+
+            const res = loadApp(suite, suite.apps[appName], overridePath ? overridePath : undefined, inputSize);
+            yield res;
+        }
     }
+
+    if (inputSizes.length === 0) {
+        for (const appName of appList(suite)) {
+            log(`Loading app: ${appName}`);
+
+            const res = loadApp(suite, suite.apps[appName], overridePath ? overridePath : undefined);
+            yield res;
+        }
+    }
+
+
 }
 
-export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPath?: string): LoadResult {
+export function loadApp<InputSize extends string>(suite: BenchmarkSuite<InputSize>, appSummary: AppSummary<InputSize>, cachedPath?: string, inputSize?: InputSize): LoadResult<InputSize> {
     const fullPath = cachedPath != undefined ? cachedPath : (() => {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
@@ -64,6 +97,10 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
     const flags = [...suite.flags];
     if (appSummary.extraFlags) {
         flags.push(...appSummary.extraFlags);
+    }
+
+    if (inputSize !== undefined) {
+        flags.push(inputSize);
     }
 
     if (suite.flags.length > 0) {
@@ -96,7 +133,7 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
             extraSources.push(extraSource);
             continue;
         }
-        
+
         if (Io.isFolder(extraSource)) {
             const [nestedExtraSources, _, __] = readSourcesInFolder(extraSource);
             extraSources.push(...nestedExtraSources);
@@ -149,7 +186,7 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
         for (const source of sources) {
             Clava.addExistingFile(source);
         }
-        
+
         keepTrying = Clava.rebuild();
 
         if (!keepTrying) {
@@ -163,7 +200,7 @@ export function loadApp(suite: BenchmarkSuite, appSummary: AppSummary, cachedPat
 
     transformApp(appSummary);
 
-    const res: LoadResult = {
+    const res: LoadResult<InputSize> = {
         success: keepTrying,
         appSummary: appSummary,
         absoluteDirents: [...absoluteNonSources, ...absoluteSubdirs],
@@ -224,7 +261,7 @@ export function copyDirentsRelative(dirents: string[], originalPath: string, tar
     }
 }
 
-function transformApp(appSummary: AppSummary): boolean {
+function transformApp<InputSize extends string>(appSummary: AppSummary<InputSize>): boolean {
     try {
         if (appSummary.amalgamate) {
             const amalgamator = new Amalgamator();
