@@ -35,7 +35,7 @@ void imsmooth(F2D *array, float dsigma, F2D *out)
     if (s > threshold)
     {
         int W = (int)ceil(4 * s);
-        float temp[2 * W + 1];
+        float *temp = (float *)malloc((2 * W + 1) * sizeof(float));
         F2D *buffer;
         float acc = 0.0;
 
