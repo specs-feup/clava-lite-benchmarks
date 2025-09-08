@@ -2,7 +2,7 @@ DEFAULT_APP = disparity
 DEFAULT_INPUT = sim_fast
 DEFAULT_N=10
 DEFAULT_TARGET=x86_64
-DEFAULT_X86_64_COMPILER = clang
+DEFAULT_X86_64_COMPILER = gcc
 DEFAULT_ARM_COMPILER = /tools/Xilinx/Vitis/2024.2/gnu/aarch64/lin/aarch64-linux/bin/aarch64-linux-gnu-gcc
 
 APP ?= $(DEFAULT_APP)
@@ -31,7 +31,10 @@ else
     $(error Could not find source folder for APP '$(APP)'; expected ./$(APP) or the current directory to contain ./data)
 endif
 
-CFLAGS = -w -O3 -fno-inline -fno-inline-functions -fno-inline-functions-called-once -fno-default-inline -fno-optimize-sibling-calls -fno-omit-frame-pointer -g
+CFLAGS_UNSAFE = -fno-omit-frame-pointer
+CFLAGS_PROF = -fno-inline -fno-inline-functions -fno-inline-functions-called-once -fno-default-inline -fno-optimize-sibling-calls
+CFLAGS_PERF = -w -O3 -g
+CFLAGS = $(CFLAGS_PERF) $(CFLAGS_PROF) #$(CFLAGS_UNSAFE)
 LDFLAGS = -lm
 SRC := $(wildcard $(BASEFOLDER)/*.c)
 OBJ = $(SRC:.c=.o)
@@ -49,7 +52,7 @@ CMD = ./$(ELF) $(ARGS)
 # Targets
 $(ELF):
 	@echo "Building $(ELF) for APP=$(APP), INPUT=$(INPUT), TARGET=$(TARGET)"
-	@$(CC) $(CFLAGS) $(LDFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK
+	@$(CC) $(CFLAGS) -o $(ELF) $(SRC) -D$(INPUT) -DGENERATE_OUTPUT -DCHECK $(LDFLAGS)
 	@echo "Build complete: $(ELF) created"
 
 .PHONY: all clean help run exectime-time allinputs exectime-perf profiling-perf exectime-time-allinputs exectime-perf-allinputs
