@@ -42,11 +42,10 @@ ELFNAME=$(APP)-$(INPUT)-$(TARGET)
 ELF=$(ELFNAME).elf
 
 ifeq ($(APP),pca)
-	ARGS = $(BASEFOLDER)/data/sat.trn 4435 37 $(INPUT)
+	ARGS := $(BASEFOLDER)/data/sat.trn 4435 37 V
 else
-	ARGS = $(BASEFOLDER)/data/$(INPUT)
+	ARGS := $(BASEFOLDER)/data/$(INPUT)
 endif
-
 CMD = ./$(ELF) $(ARGS)
 
 # Targets
@@ -246,4 +245,3 @@ profiling-perf: $(ELF)
 
 clean:
 	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png
-
