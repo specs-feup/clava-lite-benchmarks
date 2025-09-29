@@ -11,6 +11,7 @@ N ?= $(DEFAULT_N)
 TARGET ?= $(DEFAULT_TARGET)
 X86_64_COMPILER ?= $(DEFAULT_X86_64_COMPILER)
 ARM_COMPILER ?= $(DEFAULT_ARM_COMPILER)
+GPROF2CSV_PATH ?= ..
 
 # General rules for any CortexSuite-Vision benchmark
 ifeq ($(TARGET),x86_64)
@@ -33,7 +34,7 @@ endif
 
 CFLAGS_UNSAFE = -fno-omit-frame-pointer
 CFLAGS_PROF = -fno-inline -fno-inline-functions -fno-inline-functions-called-once -fno-default-inline -fno-optimize-sibling-calls
-CFLAGS_PERF = -w -O3 -g
+CFLAGS_PERF = -w -O3 -pg
 CFLAGS = $(CFLAGS_PERF) $(CFLAGS_PROF) #$(CFLAGS_UNSAFE)
 LDFLAGS = -lm
 SRC := $(wildcard $(BASEFOLDER)/*.c)
@@ -243,5 +244,15 @@ profiling-perf: $(ELF)
 	fi
 	@rm -f $(ELFNAME).perf $(ELFNAME).perf.folded perf.data perf.data.old $(ELFNAME)-callgraph.txt $(ELFNAME)-callgraph-folded.txt
 
+profiling-gprof: $(ELF)
+	@echo "Running gprof on: $(CMD)"
+	@./$(ELF) $(ARGS)
+	@gprof $(ELF) gmon.out > $(ELFNAME)-gprof.txt
+	@echo "gprof output saved to $(ELFNAME)-gprof.txt"
+	@python3 $(GPROF2CSV_PATH)/gprof2csv.py $(ELFNAME)-gprof.txt $(APP)-profile.csv
+	@echo "CSV profile generated: $(APP)-profile.csv"
+	@rm -f gmon.out
+
 clean:
-	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png
+	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png *-gprof.txt *.gmon *.gprof *.perf *folded.txt *perf.folded
+	@echo "Clean complete."
