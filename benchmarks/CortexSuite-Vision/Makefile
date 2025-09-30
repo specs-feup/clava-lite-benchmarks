@@ -43,7 +43,7 @@ ELFNAME=$(APP)-$(INPUT)-$(TARGET)
 ELF=$(ELFNAME).elf
 
 ifeq ($(APP),pca)
-	ARGS := $(BASEFOLDER)/data/sat.trn 4435 37 V
+	ARGS := $(BASEFOLDER)/data/sat.trn 4435 37 V > pca_output.txt
 else
 	ARGS := $(BASEFOLDER)/data/$(INPUT)
 endif
