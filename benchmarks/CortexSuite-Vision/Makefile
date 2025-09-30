@@ -248,11 +248,18 @@ profiling-gprof: $(ELF)
 	@echo "Running gprof on: $(CMD)"
 	@./$(ELF) $(ARGS)
 	@gprof $(ELF) gmon.out > $(ELFNAME)-gprof.txt
-	@echo "gprof output saved to $(ELFNAME)-gprof.txt"
-	@python3 $(GPROF2CSV_PATH)/gprof2csv.py $(ELFNAME)-gprof.txt $(APP)-profile.csv
-	@echo "CSV profile generated: $(APP)-profile.csv"
-	@rm -f gmon.out
+	@python3 $(GPROF2CSV_PATH)/gprof2csv.py $(ELFNAME)-gprof.txt $(ELFNAME)-profile.csv
+	@echo "   CSV profile generated: $(APP)-profile.csv"
+	@if command -v gprof2dot >/dev/null 2>&1; then \
+		gprof $(ELF) gmon.out | gprof2dot | dot -Tpng -o $(ELFNAME)-callgraph.png; \
+		echo "Call graph PNG generated: $(ELFNAME)-callgraph.png"; \
+		gprof $(ELF) gmon.out | gprof2dot | dot -Tsvg -o $(ELFNAME)-callgraph.svg; \
+		echo "Call graph SVG generated: $(ELFNAME)-callgraph.svg"; \
+	else \
+		echo "gprof2dot not found in PATH, skipping call graph generation."; \
+	fi
+	@rm -f gmon.out *.gmon $(ELFNAME)-gprof.txt
 
 clean:
-	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png *-gprof.txt *.gmon *.gprof *.perf *folded.txt *perf.folded
+	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png *-gprof.txt *.gmon *.gprof *.perf *folded.txt *perf.folded gmon.out
 	@echo "Clean complete."
