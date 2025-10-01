@@ -12,6 +12,7 @@ TARGET ?= $(DEFAULT_TARGET)
 X86_64_COMPILER ?= $(DEFAULT_X86_64_COMPILER)
 ARM_COMPILER ?= $(DEFAULT_ARM_COMPILER)
 GPROF2CSV_PATH ?= ..
+GPROFNG2CSV_PATH ?= ..
 
 # General rules for any CortexSuite-Vision benchmark
 ifeq ($(TARGET),x86_64)
@@ -91,19 +92,6 @@ run: $(ELF)
 	@echo "Running $(CMD)"
 	@$(CMD)
 
-run-allinputs: $(ELF)
-	@echo "Running $(CMD) on all inputs in: $(BASEFOLDER)/data"
-	@for dir in $(BASEFOLDER)/data/*/; do \
-		input_name=$$(basename "$$dir"); \
-		if [ "$$input_name" = "GroundData" ]; then \
-			echo "Skipping $$input_name"; \
-			continue; \
-		fi; \
-		echo "Running with input: $$input_name"; \
-		$(MAKE) run INPUT=$$input_name; \
-	done; \
-	echo "All inputs processed."
-
 exectime-time: $(ELF)
 	@echo "Running with millisecond timing $N times on: $(CMD)"
 	@total=0; count=0; \
@@ -139,20 +127,6 @@ exectime-time: $(ELF)
 		echo "No valid timings collected."; \
 	fi
 
-exectime-time-allinputs: $(ELF)
-	@echo "Running with millisecond timing $$N times on all inputs in: $(BASEFOLDER)/data"
-	@total=0; count=0; \
-	for dir in $(BASEFOLDER)/data/*/; do \
-		input_name=$$(basename "$$dir"); \
-		if [ "$$input_name" = "GroundData" ]; then \
-			echo "Skipping $$input_name"; \
-			continue; \
-		fi; \
-		echo "Running with input: $$input_name"; \
-		$(MAKE) exectime-time INPUT=$$input_name; \
-	done; \
-	echo "All inputs processed."
-
 exectime-perf: $(ELF)
 	@echo "Running perf stat $N times on: $(CMD)"
 	@total=0; count=0; \
@@ -179,20 +153,6 @@ exectime-perf: $(ELF)
 	else \
 		echo "No valid task-clock times collected."; \
 	fi
-
-exectime-perf-allinputs: $(ELF)
-	@echo "Running perf stat $$N times on all inputs in: $(BASEFOLDER)/data"
-	@total=0; count=0; \
-	for dir in $(BASEFOLDER)/data/*/; do \
-		input_name=$$(basename "$$dir"); \
-		if [ "$$input_name" = "GroundData" ]; then \
-			echo "Skipping $$input_name"; \
-			continue; \
-		fi; \
-		echo "Running with input: $$input_name"; \
-		$(MAKE) exectime-perf INPUT=$$input_name; \
-	done; \
-	echo "All inputs processed."
 
 profiling-perf: $(ELF)
 	@echo "Running perf on: $(CMD)"
@@ -260,6 +220,15 @@ profiling-gprof: $(ELF)
 	fi
 	@rm -f gmon.out *.gmon $(ELFNAME)-gprof.txt
 
+profiling-gprofng: $(ELF)
+	@echo "Running gprofng on: $(CMD)"
+	@rm -rf gprofng_$(ELFNAME).er 
+	@gprofng collect app -h usr_time -o gprofng_$(ELFNAME).er ./$(ELF) $(ARGS)
+	@gprofng display text -functions gprofng_disparity-fullhd-x86_64.er > $(ELFNAME)_functions.txt
+	@python3 $(GPROFNG2CSV_PATH)/gprofng2csv.py $(ELFNAME)_functions.txt $(ELFNAME)-profile.csv
+	@echo "   CSV profile generated: $(ELFNAME)-profile.csv"
+	@rm -rf gprofng_$(ELFNAME).er $(ELFNAME)_functions.txt gmon.out
+
 clean:
-	@rm -f *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png *-gprof.txt *.gmon *.gprof *.perf *folded.txt *perf.folded gmon.out
+	@rm -rf *.elf out.perf out.folded perf.data perf.data.old *-callgraph.txt $(OBJ) *.svg *.csv *.dot *.png *-gprof.txt *.gmon gmon.out *.gprof *.perf *folded.txt *perf.folded gmon.out gprofng_*.er *functions.txt
 	@echo "Clean complete."
