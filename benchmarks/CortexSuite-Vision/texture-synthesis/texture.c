@@ -4,6 +4,7 @@ Author: Sravanthi Kota Venkata
 
 #include "texture.h"
 #include <math.h>
+#include <stdint.h>
 
 int vrstartx, vrfinishx, vrstarty, vrfinishy;
 extern params data;
@@ -13,6 +14,19 @@ int anotherpass = 0, maxcand = 40;
 F2D *target, *result;
 int *xloopout, *yloopout;
 int *xloopin, *yloopin;
+
+// SPeCS: providing implementation of double drand48(void);
+uint64_t drand48_state = 0x1234ABCD330EULL;
+
+double reimpl_drand48()
+{
+    const uint64_t a = 0x5DEECE66DULL;
+    const uint64_t c = 0xBULL;
+    const uint64_t mask = (1ULL << 48) - 1ULL;
+    drand48_state = (drand48_state * a + c) & mask;
+    return (double)drand48_state / (double)(1ULL << 48);
+}
+// End of SPeCS addition
 
 double compare_rest(F2D *image, int x, int y, F2D *tar, int x1, int y1, params *data);
 
@@ -174,16 +188,20 @@ int create_candidates(int x, int y, params *data)
 
             if (arrayref(candlistx, n) >= vrfinishx || arrayref(candlistx, n) < vrstartx)
             {
-                arrayref(candlistx, n) = vrstartx + (int)(drand48() * (vrfinishx - vrstartx));
-                arrayref(candlisty, n) = vrstarty + (int)(drand48() * (vrfinishy - vrstarty));
+                double rand1 = reimpl_drand48();
+                double rand2 = reimpl_drand48();
+                arrayref(candlistx, n) = vrstartx + (int)(rand1 * (vrfinishx - vrstartx));
+                arrayref(candlisty, n) = vrstarty + (int)(rand2 * (vrfinishy - vrstarty));
                 n++;
                 continue;
             }
 
             if (arrayref(candlisty, n) >= vrfinishy)
             {
-                arrayref(candlisty, n) = vrstarty + (int)(drand48() * (vrfinishy - vrstarty));
-                arrayref(candlistx, n) = vrstartx + (int)(drand48() * (vrfinishx - vrstartx));
+                double rand1 = reimpl_drand48();
+                double rand2 = reimpl_drand48();
+                arrayref(candlisty, n) = vrstarty + (int)(rand1 * (vrfinishy - vrstarty));
+                arrayref(candlistx, n) = vrstartx + (int)(rand2 * (vrfinishx - vrstartx));
                 n++;
                 continue;
             }
@@ -221,8 +239,10 @@ int create_all_candidates(int x, int y, params *data)
 
             if (arrayref(candlistx, n) >= vrfinishx || arrayref(candlistx, n) < vrstartx)
             {
-                arrayref(candlistx, n) = vrstartx + (int)(drand48() * (vrfinishx - vrstartx));
-                arrayref(candlisty, n) = vrstarty + (int)(drand48() * (vrfinishy - vrstarty));
+                double rand1 = reimpl_drand48();
+                double rand2 = reimpl_drand48();
+                arrayref(candlistx, n) = vrstartx + (int)(rand1 * (vrfinishx - vrstartx));
+                arrayref(candlisty, n) = vrstarty + (int)(rand2 * (vrfinishy - vrstarty));
                 n++;
                 //                printf("1: (%d,%d)\t%d\n", i,j,n);
                 continue;
@@ -230,8 +250,10 @@ int create_all_candidates(int x, int y, params *data)
 
             if (arrayref(candlisty, n) >= vrfinishy || arrayref(candlisty, n) < vrstarty)
             {
-                arrayref(candlisty, n) = vrstarty + (int)(drand48() * (vrfinishy - vrstarty));
-                arrayref(candlistx, n) = vrstartx + (int)(drand48() * (vrfinishx - vrstartx));
+                double rand1 = reimpl_drand48();
+                double rand2 = reimpl_drand48();
+                arrayref(candlisty, n) = vrstarty + (int)(rand1 * (vrfinishy - vrstarty));
+                arrayref(candlistx, n) = vrstartx + (int)(rand2 * (vrfinishx - vrstartx));
                 n++;
                 //                printf("2: (%d,%d)\t%d\n", i,j,n);
                 continue;
@@ -274,8 +296,10 @@ void init(F2D *image, params *data)
                 //            && asubsref(target,a(j,i,data->widthout)+B) == 1.0
             )
             {
-                tmpx = vrstartx + (int)(drand48() * (vrfinishx - vrstartx));
-                tmpy = vrstarty + (int)(drand48() * (vrfinishy - vrstarty));
+                double rand1 = reimpl_drand48();
+                double rand2 = reimpl_drand48();
+                tmpx = vrstartx + (int)(rand1 * (vrfinishx - vrstartx));
+                tmpy = vrstarty + (int)(rand2 * (vrfinishy - vrstarty));
                 if (!anotherpass)
                 {
                     arrayref(atlas, aa(j, i)) = tmpx;
