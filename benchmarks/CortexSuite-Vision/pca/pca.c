@@ -235,7 +235,9 @@ float *vector(int n)
     v = (float *)malloc((unsigned)n * sizeof(float));
     if (!v)
         erhand("Allocation failure in vector().");
-    return v - 1;
+    // SPeCS: turned v - 1 into just v because our Outliner can't handle it
+    // return v - 1;
+    return v;
 }
 
 /**  Allocation of float matrix storage  *****************************/
@@ -270,7 +272,9 @@ float **matrix(int n, int m)
 void free_vector(float *v, int n)
 /* Free a float vector allocated by vector(). */
 {
-    free((char *)(v + 1));
+    // SPeCS: changed v + 1 to just v because our Outliner can't handle it
+    // free((char *)(v + 1));
+    free((char *)(v));
 }
 
 /**  Deallocate float matrix storage  ***************************/
