@@ -62,13 +62,26 @@
 
 
 /* Default data type */
-# if !defined(DATA_TYPE_IS_INT) && !defined(DATA_TYPE_IS_FLOAT) && !defined(DATA_TYPE_IS_DOUBLE)
+# if !defined(DATA_TYPE_IS_INT) && !defined(DATA_TYPE_IS_FLOAT) && !defined(DATA_TYPE_IS_DOUBLE) && !defined(DATA_TYPE_IS_CHAR)
 #  define DATA_TYPE_IS_DOUBLE
 # endif
 
 #ifdef DATA_TYPE_IS_INT
 #  define DATA_TYPE int
 #  define DATA_PRINTF_MODIFIER "%d "
+#  define SCALAR_VAL(x) (int) x
+#  define SQRT_FUN(x) ((int) sqrtf((float) x))
+#  define EXP_FUN(x) ((int) expf((float) x))
+#  define POW_FUN(x,y) ((int) powf((float) x, (float) y))
+#endif
+
+#ifdef DATA_TYPE_IS_CHAR
+#  define DATA_TYPE signed char
+#  define DATA_PRINTF_MODIFIER "%d "
+#  define SCALAR_VAL(x) (signed char) x
+#  define SQRT_FUN(x) ((char) sqrtf((float) x))
+#  define EXP_FUN(x) ((char) expf((float) x))
+#  define POW_FUN(x,y) ((char) powf((float) x, (float) y))
 #endif
 
 #ifdef DATA_TYPE_IS_FLOAT

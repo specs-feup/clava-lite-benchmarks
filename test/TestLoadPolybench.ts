@@ -5,7 +5,7 @@ import { copyDirentsAbsolute, loadSuite } from "../src/LiteBenchmarkLoader.js";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 
 
-for (const res of loadSuite(POLYBENCH_4_2, undefined, POLYBENCH_SIZES.MEDIUM, POLYBENCH_SIZES.LARGE)) {
+for (const res of loadSuite(POLYBENCH_4_2, undefined, POLYBENCH_SIZES.SMALL)) {
     const name = res.appSummary.canonicalName;
 
     if (res.success) {

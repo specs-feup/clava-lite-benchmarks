@@ -367,88 +367,88 @@ class PolyBench_4_2 extends BenchmarkSuite<POLYBENCH_SIZES> {
             "benchmarks/Polybench/4.2/",
             {
                 "2mm": {
-                    standard: "c11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "2mm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "3mm": {
-                    standard: "c11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "3mm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "adi": {
-                    standard: "c11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "adi", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "atax": {
-                    standard: "c11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "atax", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "bicg": {
-                    standard: "c11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "bicg", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "cholesky": {
-                    standard: "c11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "cholesky", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "correlation": {
-                    standard: "c11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "correlation", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "covariance": {
-                    standard: "c11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "covariance", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "deriche": {
-                    standard: "c11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "deriche", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "doitgen": {
-                    standard: "c11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "doitgen", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "durbin": {
-                    standard: "c11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "durbin", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "gemm": {
-                    standard: "c11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "gemm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "gemver": {
-                    standard: "c11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "gemver", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "gesummv": {
-                    standard: "c11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "gesummv", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "gramschmidt": {
-                    standard: "c11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "gramschmidt", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "heat-3d": {
-                    standard: "c11", topFunction: "main", canonicalName: "heat-3d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "heat-3d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "jacobi-1d": {
-                    standard: "c11", topFunction: "main", canonicalName: "jacobi-1d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "jacobi-1d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "jacobi-2d": {
-                    standard: "c11", topFunction: "main", canonicalName: "jacobi-2d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "jacobi-2d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "lu": {
-                    standard: "c11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "lu", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "ludcmp": {
-                    standard: "c11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "ludcmp", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "mvt": {
-                    standard: "c11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "mvt", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "seidel-2d": {
-                    standard: "c11", topFunction: "main", canonicalName: "seidel-2d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "seidel-2d", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "symm": {
-                    standard: "c11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "symm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "syr2k": {
-                    standard: "c11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "syr2k", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "syrk": {
-                    standard: "c11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "syrk", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "trisolv": {
-                    standard: "c11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "trisolv", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 },
                 "trmm": {
-                    standard: "c11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
+                    standard: "gnu11", topFunction: "main", canonicalName: "trmm", extraSourceFiles: ["../polybench"], invalidInputSizes: []
                 }
             },
-            ["-lm", "-DPOLYBENCH_TIME"]
+            ["-lm", "-DPOLYBENCH_TIME", "-DDATA_TYPE_IS_CHAR"]
         );
     }
 }
