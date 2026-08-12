@@ -9,6 +9,9 @@ const config = {
   globalSetup: "@specs-feup/lara/jest/jestGlobalSetup.js",
   globalTeardown: "@specs-feup/lara/jest/jestGlobalTeardown.js",
   setupFiles: ["@specs-feup/lara/jest/setupFiles/sharedJavaModule.js"],
+  transform: {
+    "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.jest.json", useESM: true }],
+  },
   //notify: true,
   //notifyMode: "always",
   //verbose: true,
