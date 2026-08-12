@@ -10,7 +10,7 @@ export abstract class SuiteRunner {
         this.lineLength = lineLength;
     }
 
-    public runScriptForSuite(suite: BenchmarkSuite, apps: string[], config: Record<string, any>, disableCaching: boolean = true): boolean {
+    public runScriptForSuite<InputSize extends string>(suite: BenchmarkSuite<InputSize>, apps: string[], config: Record<string, any>, disableCaching: boolean = true): boolean {
         for (const app of apps) {
             this.log(`Running ${this.getScriptName()} for app ${app} of benchmark suite ${suite.name}`);
             const cachedPath = `${config.outputDir}/${app}/src/trans`;
@@ -21,7 +21,7 @@ export abstract class SuiteRunner {
             }
 
             let invalidCache = false;
-            let res: LoadResult;
+            let res: LoadResult<InputSize>;
 
             if (disableCaching) {
                 this.log(`Caching is disabled, loading original version of ${app}...`);

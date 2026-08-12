@@ -1,10 +1,10 @@
 import { copyDirentsRelative, loadApp, LoadResult, loadSuite } from "../src/LiteBenchmarkLoader.js";
-import { CORTEXSUITE_VISION } from "../src/BenchmarkSuites.js";
+import { CORTEXSUITE_VISION, NOSIZES  } from "../src/BenchmarkSuites.js";
 import { FileJp } from "@specs-feup/clava/api/Joinpoints.js";
 import Query from "@specs-feup/lara/api/weaver/Query.js";
 import Clava from "@specs-feup/clava/api/clava/Clava.js";
 
-function handleApp(res: LoadResult): void {
+function handleApp(res: LoadResult<NOSIZES>): void {
     const name = res.appSummary.canonicalName;
 
     for (const file of Query.search(FileJp)) {

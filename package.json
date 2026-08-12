@@ -12,6 +12,7 @@
     "test:app": "npx clava classic dist/test/TestLoadApp.js",
     "test:cortex-vision": "npx clava classic dist/test/TestLoadCortexSuiteVision.js -ncg",
     "test:rosetta": "npx clava classic  dist/test/TestLoadRosetta.js -ncg",
+    "test:polybench4_2": "npx clava classic  dist/test/TestLoadPolybench.js -ncg",
     "test:rosetta-single": "npx clava classic  dist/test/TestLoadRosettaSingle.js",
     "test:spec": "npx clava classic  dist/test/TestLoadSPEC.js"
   },
@@ -26,7 +27,7 @@
     "edgecases"
   ],
   "dependencies": {
-    "@specs-feup/clava": "^3.0.8",
+    "@specs-feup/clava": "3.0.32",
     "@specs-feup/clava-code-transforms": "^1.0.1",
     "@specs-feup/lara": "^3.0.5",
     "chalk": "^5.3.0"
