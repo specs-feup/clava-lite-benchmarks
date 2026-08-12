@@ -9,6 +9,7 @@
     "build:watch": "tsc --watch",
     "lint": "eslint .",
     "docs": "typedoc",
+    "test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --runInBand --forceExit",
     "test:app": "npx clava classic dist/test/TestLoadApp.js",
     "test:cortex-vision": "npx clava classic dist/test/TestLoadCortexSuiteVision.js -ncg",
     "test:rosetta": "npx clava classic  dist/test/TestLoadRosetta.js -ncg",
@@ -27,9 +28,9 @@
     "edgecases"
   ],
   "dependencies": {
-    "@specs-feup/clava": "3.0.32",
-    "@specs-feup/clava-code-transforms": "^1.0.1",
-    "@specs-feup/lara": "^3.0.5",
+    "@specs-feup/clava": "^3.5.2",
+    "@specs-feup/clava-code-transforms": "^1.2.1",
+    "@specs-feup/lara": "^3.5.1",
     "chalk": "^5.3.0"
   },
   "devDependencies": {
