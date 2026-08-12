@@ -1,6 +1,6 @@
 {
   "name": "@specs-feup/clava-lite-benchmarks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Tiago Lascasas Santos <tiagolascasas@outlook.com> (https://tiagolascasas.dev)",
   "description": "A collection of applications and benchmark suites used as testing inputs to several Clava NPM packages",
   "type": "module",
